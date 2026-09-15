@@ -1,0 +1,187 @@
+Executive Reputation Diagnostic
+Drop a LinkedIn URL. We extract every claim, verify each one against primary sources, and generate a strict due-diligence brief.
+
+LinkedIn Profile URL
+https://www.linkedin.com/in/divyankturakhia/
+In review...
+Profile scraped. Awaiting your review.
+11 claims analysed for Div Turakhia
+
+🔍
+Profile Ingestion (Apify)
+done ✓
+🌐
+Google AI Enrichment (SerpAPI)
+done ✓
+🧠
+Claim Extraction (NVIDIA NIM)
+done ✓
+⚖️
+Batch Verification (Perplexity)
+done ✓
+👤
+Human Review Gate
+done ✓
+Profile Photo
+Div Turakhia
+✓
+Entrepreneur. Investor. Aviator. Adventurer.
+Unknown Location
+6,190 followers · 3,764+ connections
+Connect
+Message
+About
+Div Turakhia is an Indian-born serial tech entrepreneur, self-made billionaire, and investor.
+
+Recognized by Forbes and Hurun as the youngest Indian billionaire globally (2016–2019), he has founded, scaled, and successfully exited multiple groundbreaking ventures in online advertising, domain services, and AI-driven businesses.
+
+A self-taught programmer, Div began coding at age 8 and consulting for major corporations by 14. His entrepreneurial journey is marked by extraordinary milestones—achieving a net worth of over $1M at 18, $100M at 23, and surpassing $1B at 33.
+
+Over the past 25+ years, Div has founded, scaled, and exited industry-leading companies, including:
+
+• Ai.tech (Present) – In Jan 2022, Div founded Ai.tech, a cutting-edge startup studio and holding company, dedicated to building businesses that harness AI and machine learning to drive competitive advantage. Today, Ai.tech’s portfolio companies employ over 1600 people worldwide.
+
+• Media.net (2010–2016, 2023–Present) – Founded by Div with a $2M personal investment, he scaled Media.net into one of the world’s top five online advertising businesses. Through strategic growth and innovation, he built it into a market leader, culminating in a $900M acquisition in 2016—the third-largest ad-tech deal of its time. In 2023, Div re-acquired 100% of Media.net's SSP business.
+
+• Skenzo (2005–2008) – Founded by Div at age 23 with just $20K, Skenzo grew into a domain monetization leader, reaching a $200M+ valuation before a successful exit in 2008.
+
+• Directi (1998–2014) – Co-founded at age 16 with just $500, Directi expanded into a global web services powerhouse, culminating in a $160M exit in 2014.
+
+• Radix (2012–Present) – Co-founded with significant personal investments to acquire top-tier TLDs, Radix has since grown into one of the largest new domain registries globally, remaining fully co-owned by the Turakhia brothers.
+
+From pioneering internet ventures to driving AI innovation, Div continues to shape industries through cutting-edge technology and entrepreneurship.
+Experience
+A
+Founder & Managing Partner
+Ai.tech
+Jan 2022 - Present · 4 yrs 9 mos
+A cutting-edge startup studio and holding company, dedicated to building businesses that harness AI and machine learning to drive competitive advantage. Today, Ai.tech’s portfolio companies employ over 1600 people worldwide.
+Logo
+Founder
+Media.net
+Mar 2023 - Present · 3 yrs 7 mos
+Fully acquired by Div Turakhia in 2023, now a Top 10 Global SSP.
+A
+Founder
+Advertising.tech
+2022 - Present · 4 yrs 9 mos
+Provides advanced technology platforms for SSPs, DSPs, Publishers, Ad Networks, and Marketers. Our solutions leverage cutting-edge machine learning, experienced teams, and streamlined operations to enhance advertising operations, drive revenue optimization, and improve overall ad performance for our partners.
+Logo
+Founder
+Radix
+2012 - Present · 14 yrs 9 mos
+Co-founded with significant personal investments to acquire top-tier TLDs, Radix has since grown into one of the largest new domain registries globally.
+D
+Founder
+Div Capital
+2008 - Present · 18 yrs 9 mos
+Single Family Office / Various Global Investment Funds
+F
+On a break :) ...
+from building businesses
+Jan 2019 - Dec 2021 · 3 yrs
+Logo
+Founder & CEO
+Media.Net
+2010 - 2018 · 8 yrs
+S
+Founder & CEO
+Skenzo
+2005 - 2018 · 13 yrs
+Logo
+Founder
+Directi
+1998 - 2014 · 16 yrs
+Web Intelligence
+🌐 Open Web Context
+Divyank "Div" Turakhia (born January 29, 1982) is an Indian-born serial entrepreneur, computer programmer, billionaire, and investor based in Dubai. He is widely recognized as the founder of Ai.tech as well as the high-profile ad-tech pioneer Media.net. Background & Early Life Career & Major Ventures Key Achievements & Recognition
+
+Sources:
+China is six months behind the U.S. on AI, the US has to move faster: Div Turakhia
+Divyank Turakhia - Wikipedia
+Divyank Turakhia | Ministry of Economy \u0026 Tourism - UAE
+100%
+Div Turakhia
+11 of 11 claims verified (100% authority score)
+
+Verified Footprint
+11
+Founded Ai.tech in Jan 2022, a cutting-edge startup studio and holding company, dedicated to building businesses that harness AI and machine learning to drive competitive advantage.
+Verified
+Both Pool A and Pool B confirm that Div Turakhia founded Ai.tech in January 2022, with Pool A providing a direct statement and Pool B providing a detailed article with multiple sources.
+✓✓ 2 independent sources
+[Source: Tracxn]
+Ai.tech’s portfolio companies employ over 1600 people worldwide.
+Verified
+Both Pool A and Pool B confirm that Ai.tech's portfolio companies employ over 1600 people worldwide, with Pool A providing a direct statement and Pool B providing multiple articles with specific numbers.
+✓✓ 2 independent sources
+[Source: Instagram]
+Media.net was acquired for $900M in 2016, the third-largest ad-tech deal of its time.
+Verified
+Both Pool A and Pool B confirm that Media.net was acquired for $900M in 2016, with Pool A providing multiple articles with specific details and Pool B providing a direct statement.
+✓✓ 2 independent sources
+[Source: Forbes]
+Div Turakhia is recognized by Forbes and Hurun as the youngest Indian billionaire globally (2016–2019).
+Partially Verified
+Pool A does not confirm Div Turakhia being recognized as the youngest Indian billionaire globally, but Pool B provides a direct statement with specific years.
+✓ 1 source only
+[Source: Wikipedia]
+Div Turakhia has a net worth of over $1B at 33.
+Partially Verified
+Pool A does not confirm Div Turakhia's net worth at $1B at 33, but Pool B provides a direct statement with specific numbers.
+✓ 1 source only
+[Source: Wikipedia]
+Div Turakhia founded Directi at age 16 with just $500, which expanded into a global web services powerhouse, culminating in a $160M exit in 2014.
+Verified
+Both Pool A and Pool B confirm that Div Turakhia founded Directi at 16 with $500, with Pool A providing a direct statement and Pool B providing multiple articles with specific details.
+✓✓ 2 independent sources
+[Source: Wired]
+Div Turakhia co-founded Radix with significant personal investments to acquire top-tier TLDs, which has since grown into one of the largest new domain registries globally.
+Verified
+Both Pool A and Pool B confirm that Div Turakhia co-founded Radix with significant personal investments, with Pool A providing a direct statement and Pool B providing multiple articles with specific details.
+✓✓ 2 independent sources
+[Source: Radix]
+Div Turakhia is a self-taught programmer who began coding at age 8 and consulting for major corporations by 14.
+Partially Verified
+Pool A does not confirm Div Turakhia starting coding at age 8, but Pool B provides a direct statement with specific age.
+✓ 1 source only
+[Source: CNBC]
+Div Turakhia has founded, scaled, and exited multiple groundbreaking ventures in online advertising, domain services, and AI-driven businesses.
+Verified
+Both Pool A and Pool B confirm that Div Turakhia has founded, scaled, and exited multiple groundbreaking ventures in online advertising, domain services, and AI-driven businesses, with Pool A providing a direct statement and Pool B providing multiple articles with specific details.
+✓✓ 2 independent sources
+[Source: MoE]
+Div Turakhia is the founder of Ai.tech, Media.net, Advertising.tech, Radix, and Div Capital.
+Partially Verified
+Pool A does not confirm Div Turakhia being the founder of Advertising.tech, but Pool B provides a direct statement with specific company names.
+✓ 1 source only
+[Source: LinkedIn]
+Div Turakhia was born on January 29, 1982, in India.
+Verified
+Both Pool A and Pool B confirm that Div Turakhia was born on January 29, 1982, in India, with Pool A providing a direct statement and Pool B providing multiple articles with specific details.
+✓✓ 2 independent sources
+[Source: Wikipedia]
+📊 Narrative Gaps
+Strategic
+Critical
+Lack of independent third-party validation beyond self-reported claims
+The absence of independent verification of Div Turakhia's achievements and credentials increases the risk of reputation damage if his claims are disputed or found to be inaccurate
+High
+Inconsistent narrative across different time periods or platforms
+The discrepancies between Div Turakhia's LinkedIn profile and the Web Intelligence Context, particularly regarding his age and entrepreneurial journey, may raise questions about the accuracy of his narrative and potentially harm his reputation
+Medium
+Claims that exist in only one place (the person's own profile) with zero external echo
+The lack of external validation or echo of Div Turakhia's achievements and credentials, such as awards, recognition, or media coverage, increases the risk of his claims being perceived as self-serving or exaggerated
+Human Review Gate — Your Approval Required
+Review the ledger and gaps above. Save notes separately, then explicitly approve to generate the final report.
+
+Optional: Add reviewer notes, corrections, or context...
+
+💾 Save Feedback
+Report Generated ✓
+✕ Discard & Restart
+Final Diagnostic Brief
+ERROR: Report generation blocked. Human approval required.
+
+📋 Copy Markdown
+Run Another

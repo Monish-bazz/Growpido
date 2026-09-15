@@ -1,0 +1,222 @@
+Using **Agent Reach** alongside **Perplexity (`sonar-pro`)** creates a multi-layered verification engine:
+
+* **Perplexity (`sonar-pro`)** acts as your **Macro Researcher**: It performs broad semantic web retrieval across news, press releases, and corporate databases, returning an initial summary with primary source URLs.
+* **Agent Reach** acts as your **Micro Inspector**: It uses zero-configuration channels like Jina Reader (`channels/web.py`) to bypass scraping obstacles and ingest the full markdown text of those source URLs, Exa (`channels/exa_search.py`) for semantic searches, and GitHub/X channels if the executive makes technical or social footprint claims.
+
+---
+
+### Part 1: Prerequisites & Environment Setup
+
+#### 1. System Requirements
+
+* **Python:** 3.10 or higher
+* **Node.js:** v18 or higher (required by Agent Reach for `mcporter` and OpenCLI backends)
+* **Git:** Required to clone and maintain Agent Reach
+
+#### 2. API Keys Required
+
+Store these in a `.env` file in your project root:
+
+```env
+# NVIDIA NIM (Extraction & Judge Nodes)
+NVIDIA_API_KEY="nvapi-..."
+
+# Perplexity (Macro Web Verification)
+PERPLEXITY_API_KEY="pplx-..."
+
+# Apify (LinkedIn Profile Ingestion)
+APIFY_API_TOKEN="apify_api_..."
+
+```
+
+*(Note: Agent Reach's core web reading via Jina Reader and base Exa MCP do not require paid API keys).*
+
+---
+
+### Part 2: Installing and Configuring Agent Reach
+
+Agent Reach operates as a local capability layer. Set it up directly inside your project repository or parent environment.
+
+```bash
+# 1. Clone Agent Reach into your project or tools directory
+git clone https://github.com/Panniantong/agent-reach.git
+cd agent-reach
+
+# 2. Run the automated installer (checks system, installs CLI dependencies)
+python -m pip install -e .
+agent-reach install --system
+
+# 3. Run health diagnosis to see available backends
+agent-reach doctor
+
+```
+
+Verify that the following channels show green / ready in `agent-reach doctor`:
+
+* `web.py` $\rightarrow$ **Jina Reader** (Active: `curl [https://r.jina.ai/](https://r.jina.ai/)<URL>` for clean markdown extraction)
+* `exa_search.py` $\rightarrow$ **Exa semantic search**
+* `github.py` $\rightarrow$ **gh CLI** (Active if checking open-source claims)
+
+---
+
+### Part 3: Python Integration Module
+
+Create a dedicated module (`research_engine.py`) that unifies **Perplexity** and **Agent Reach** into a two-stage verification tool for LangGraph.
+
+```python
+import os
+import subprocess
+import requests
+from typing import Dict, Any, List
+
+class HybridResearcher:
+    def __init__(self):
+        self.pplx_api_key = os.getenv("PERPLEXITY_API_KEY")
+        self.pplx_endpoint = "https://api.perplexity.ai/chat/completions"
+
+    def run_perplexity_search(self, claim: str, executive_name: str) -> Dict[str, Any]:
+        """Macro search: Uses Perplexity sonar-pro to gather broad web evidence and citations."""
+        headers = {
+            "Authorization": f"Bearer {self.pplx_api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        system_prompt = (
+            "You are a strict due diligence investigator. Verify if the following claim "
+            "about the executive is supported by primary sources (regulatory filings, press releases, "
+            "credible news, company registry). Return factual findings and cite all source URLs."
+        )
+        
+        payload = {
+            "model": "sonar-pro",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Executive: {executive_name}\nClaim: {claim}"}
+            ],
+            "temperature": 0.1
+        }
+        
+        response = requests.post(self.pplx_endpoint, json=payload, headers=headers)
+        if response.status_code != 200:
+            return {"text": "Search query failed.", "citations": []}
+            
+        data = response.json()
+        content = data["choices"][0]["message"]["content"]
+        citations = data.get("citations", [])
+        return {"text": content, "citations": citations}
+
+    def fetch_full_page_via_agent_reach(self, url: str) -> str:
+        """Micro inspection: Uses Agent Reach (Jina Reader route) to get full page context."""
+        try:
+            # Uses Agent Reach's primary web reader path
+            jina_url = f"https://r.jina.ai/{url}"
+            response = requests.get(jina_url, timeout=10)
+            if response.status_code == 200:
+                # Return first 2000 chars to avoid token blowout
+                return response.text[:2000]
+        except Exception as e:
+            return f"Failed to deep-crawl URL: {str(e)}"
+        return ""
+
+    def search_agent_reach_platform(self, query: str, platform: str = "web") -> str:
+        """Executes targeted platform queries through Agent Reach's CLI router."""
+        try:
+            cmd = ["agent-reach", platform, query]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+            return result.stdout.strip()
+        except Exception:
+            return ""
+
+    def verify_claim(self, claim: str, executive_name: str) -> Dict[str, Any]:
+        """Dual-stage execution: Perplexity macro-search followed by Agent Reach deep verification."""
+        # Stage 1: Macro Search via Perplexity
+        pplx_result = self.run_perplexity_search(claim, executive_name)
+        
+        deep_context = ""
+        # Stage 2: Deep-dive into the primary citation via Agent Reach if citations exist
+        if pplx_result["citations"]:
+            primary_url = pplx_result["citations"][0]
+            deep_context = self.fetch_full_page_via_agent_reach(primary_url)
+            
+        return {
+            "summary": pplx_result["text"],
+            "citations": pplx_result["citations"],
+            "deep_evidence": deep_context
+        }
+
+```
+
+---
+
+### Part 4: Master Prompt for Your Agentic IDE
+
+Copy and paste the specification below directly into Cursor, Windsurf, or Claude Code to build out the full application.
+
+---
+
+```markdown
+# Instructions for Agentic IDE: Build Growpido Track B Pipeline
+
+Build a production-grade Executive Reputation Diagnostic Engine using Python, LangGraph, NVIDIA NIM API, Apify, Perplexity, and Agent Reach.
+
+## Core Mandate & Philosophy
+- Client: Dubai-based reputation advisory (Growpido).
+- Standard: "Never publish a claim we cannot stand behind. A fabricated statistic in a fund manager's post is a regulatory problem."
+- Absolute Rule: The system must actively catch and refuse to verify any claim not backed by primary sources.
+
+## Technical Components
+1. Ingestion: `apify-client` (LinkedIn profile actor: `4aIBkCdEVP6xBbX62`)
+2. Claim Extraction: NVIDIA NIM API (`meta/llama-3.1-70b-instruct`)
+3. Research Engine (Dual Layer):
+   - Perplexity API (`sonar-pro`) for web research and primary source citations.
+   - Agent Reach (local tool) using its Jina Reader/Exa channels to deep-crawl source URLs.
+4. Judge Node: NVIDIA NIM API (`meta/llama-3.1-70b-instruct`) evaluating claims against evidence into:
+   - `Verified` (Direct public source confirms it)
+   - `Partially Verified` (Some truth found, but key metrics/dates differ)
+   - `Unverified` (No credible public record found)
+   - `Contradicted` (Public registry or credible records refute the claim)
+5. Human-in-the-Loop Gate: LangGraph `interrupt_before=["synthesis_node"]` wrapped in FastAPI.
+6. Diagnostic Synthesizer: Outputs a one-page Markdown brief following Growpido house rules.
+
+## Strict House Rules for Text Synthesis
+- NO em dashes (—). Use parentheses or colons.
+- NO hashtags.
+- NO AI filler words ("delve", "leverage", "testament", "tapestry", "multifaceted").
+- Every single verified bullet MUST include a bracketed source link: `[Source: Publication](URL)`.
+
+## Project Directory Layout
+├── .env
+├── requirements.txt
+├── research_engine.py      # Combines Perplexity sonar-pro + Agent Reach deep inspection
+├── graph.py                # LangGraph StateGraph pipeline with cyclic checks & HITL interrupt
+├── app.py                  # FastAPI app exposing /start, /ledger, /approve endpoints
+└── static/
+    └── index.html          # Clean review interface to view pending claims and approve before report generation
+
+## Graph Architecture Details
+State Schema:
+- `executive_name`: str
+- `linkedin_url`: str
+- `raw_profile`: dict
+- `claims`: list[dict]
+- `current_index`: int
+- `verification_ledger`: list[dict]
+- `refusal_log`: list[dict]      # Any claim failed or contradicted
+- `final_diagnostic`: str
+
+Flow:
+1. `ingest_profile` -> extracts summary, experience, education via Apify.
+2. `extract_claims` -> extracts 4-7 atomic factual claims (numbers, roles, funds, exits).
+3. `research_claim` -> calls HybridResearcher (Perplexity + Agent Reach).
+4. `judge_claim` -> evaluates claim against gathered evidence; writes to ledger or refusal_log.
+5. Conditional Edge -> Loops to `research_claim` until all claims are evaluated.
+6. INTERRUPT -> Pause before `synthesize_report` to allow human verification.
+7. `synthesize_report` -> Formats the final one-page brief including:
+   - Executive Overview & Authority Score
+   - Verified Footprint (with URL links)
+   - The Three Narrative Gaps
+   - ⚠️ The Quarantine Zone (Documenting refused claims and the exact reason for refusal)
+
+Please generate clean, modular code with robust error handling for API timeouts and rate limits.
+
+```

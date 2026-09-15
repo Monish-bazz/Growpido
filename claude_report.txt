@@ -1,0 +1,110 @@
+# Executive Reputation Diagnostic
+
+**Subject:** Divyank "Div" Turakhia, Founder, Ai.tech (Dubai)
+**Profile assessed:** linkedin.com/in/divyankturakhia
+**Date:** 15 September 2026
+**Claims tested:** 16 | **Verified:** 6 | **Partially verified:** 6 | **Unverified:** 2 | **Contradicted:** 2
+
+**Headline:** The record behind this profile is unusually strong. The profile itself is not. Two numbers on it are contradicted by primary sources, three of its most repeated superlatives trace back to a single 2016 press release, and the profile contradicts itself in four places. None of this is fatal. All of it is findable by a DIFC diligence analyst in an afternoon.
+
+---
+
+## How claims were graded
+
+Sources are tiered before they are counted, because two sources that copied each other are one source.
+
+| Tier | What counts | Examples used here |
+|---|---|---|
+| **P — Primary** | Regulatory filing, registry record, government page, acquirer's own disclosure | Endurance International SEC Form 10-Q and 8-K, ICANN records, UAE Ministry of Economy & Tourism |
+| **S — Secondary** | Named reporting with editorial standards, not a press-release rewrite | Forbes India, TechCrunch, CNBC Make It, Domain Name Wire, Business Standard |
+| **T — Tertiary** | Wikipedia, wikis, aggregators, subject's own sites, speaker bios, LinkedIn | Wikipedia, ICANNWiki, Crunchbase, directi.com, radix.website, Milken speaker bio |
+
+**Verified** requires two sources that do not share an origin, at least one of them P or S.
+**Partially verified** means the substance holds but a detail is wrong, or corroboration exists only at T.
+**Unverified** means one source, or only self-originating sources.
+**Contradicted** means a P or S source says otherwise.
+
+---
+
+## Verification ledger
+
+### Verified — publishable as written
+
+| # | Claim | Basis |
+|---|---|---|
+| 1 | Born 29 January 1982 in India | WIRED, Wikipedia, and consistent across all coverage (S+T) |
+| 2 | Co-founded Directi in 1998 at age 16 with his brother Bhavin, on roughly $500 from their father | CNBC Make It, UAE Ministry of Economy & Tourism, directi.com (P+S+T). Note: $500 per CNBC, "under $600" per Directi's own site, ₹25,000 per Indian coverage. Use "about $500." |
+| 3 | Founded Media.net in 2010 in Dubai Internet City | UAE Ministry of Economy & Tourism, Wikipedia (P+T) |
+| 4 | Sold Media.net in 2016 for $900M to a consortium led by Zhiyong Zhang of Beijing Miteno (later Shuzhi.AI) | TechCrunch, Domain Name Wire, Forbes, Wikipedia (S+T) |
+| 5 | Media.net revenue was $232M in 2015; headcount grew from ~800 in 2016 to 1,300+ by 2018 | Venture Intelligence, Media.net press release Oct 2018 (P+S) |
+| 6 | Stepped down as Media.net CEO on 15 October 2018, succeeded by Vaibhav Arya, becoming strategic advisor to the Shuzhi board | Media.net press release, Domain Name Wire (P+S) |
+
+### Partially verified — publish only with attribution or correction
+
+| # | Claim as written | What the record supports |
+|---|---|---|
+| 7 | "Youngest Indian billionaire globally (2016–2019)" | 2016, 2017 and 2018. Three consecutive years, not four. His own Milken Institute speaker bio says 2018 was the last. **Publish as 2016–2018.** |
+| 8 | "$900M acquisition, the third-largest ad-tech deal of its time" | The deal is solid. The ranking originates in one Forbes headline and has no independent league table behind it. **Attribute: "reported by Forbes as the third-largest ad-tech deal."** Also worth knowing: TechCrunch reported $426M paid at close with $474M on a schedule. "All-cash" is accurate, "paid in 2016" is not. |
+| 9 | Net worth over $1B | Real, but Forbes India lists the brothers as a single joint entry (No. 95, $1.3B in 2016; No. 97, $1.55B in 2018). Hurun's 2025 India list puts him at $3.46B. **Publish a dated figure with the ranking body named. Never publish an undated net worth.** |
+| 10 | "$1M at 18, $100M at 23" | Appears on directi.com, the Milken bio, and Venture Intelligence, all tracing to the same self-reported origin. **Attribute to him, do not assert.** |
+| 11 | Ai.tech founded Jan 2022; portfolio employs 1,600+ | Carried by Business Standard, UNI and others, all reporting the ASK Private Wealth–Hurun India Unicorn Report 2025, which also assigns a $1.5B valuation to a bootstrapped company with no external round. The inputs are company-supplied. **Attribute to the Hurun report.** |
+| 12 | Co-founded Radix, "remaining fully co-owned by the Turakhia brothers" | Wikipedia names both brothers as founders. Radix's own About page describes Bhavin starting Radix in 2012 and lists him as Co-Founder and Chairman. Wikipedia's .online, .tech and .store pages credit Radix as "founded by Bhavin Turakhia" alone. Ownership is not publicly filed. **Publish "co-founded with his brother." Do not publish ownership.** |
+| 13 | "Self-taught programmer, began coding at 8, consulting for major corporations by 14" | Consulting at 14 is well corroborated (UAE MoE, CNBC, ICANNWiki). Coding age is 8 per Wikipedia, 9 per ICANNWiki and per his own Milken bio. **Publish "started coding as a child, consulting for large companies at 14."** |
+
+### Unverified — held back
+
+| # | Claim | Why |
+|---|---|---|
+| 14 | "In 2023, Div re-acquired 100% of Media.net's SSP business" / "Fully acquired by Div Turakhia in 2023, now a Top 10 Global SSP" | No independent trace. No press release, no filing, no trade coverage in AdExchanger, Adweek or Domain Name Wire. The 2016 sale to Shuzhi is documented in detail; a full buyback of that asset would normally leave the same kind of trail and does not. Sole source is the profile itself. |
+| 15 | Media.net is "one of the world's top five online advertising businesses" and "the second-largest contextual advertising business by revenue" | These exact phrases appear in Media.net's own October 2018 press release and were then copied into Wikipedia, a UAE government page and dozens of aggregators. Every instance is the same sentence. One source wearing six hats. |
+
+### Contradicted — refused
+
+| # | Claim | What primary sources say |
+|---|---|---|
+| 16 | "Directi ... culminating in a $160M exit in 2014" | **This is the strongest refusal in the file.** Endurance International Group's Form 10-Q states the final purchase price was **$109.8M**: $82.6M cash plus 2,269,579 shares valued at $27.2M. The earlier S-1 set the range at $100M to $110M. The deal closed 28 January 2014. The $160M figure circulates widely, including on directi.com, radix.website and Directi's own LinkedIn page, but the acquirer's SEC filing is the primary record and it says otherwise. Separately, what sold was Directi's **web presence business** (ResellerClub, LogicBoxes, webhosting.info, BigRock). Directi retained Media.net, Skenzo, Radix, CodeChef, Flock and Zeta. "Directi exited for $160M" is wrong on both the number and the object. |
+| 17 | "Net worth ... surpassing $1B at 33" and "Skenzo ... $200M+ valuation before a successful exit in 2008" | **Age 33:** every source including his own company's site says 34. Directi.com: "over $1B at 34." CNBC, Domain Name Wire, Milken and the UAE Ministry all say 34, in 2016. Born January 1982, he was 34 in August 2016. **Skenzo:** Forbes India reports that PEs valued Skenzo at $240M and that in 2008 the brothers realised $200M by selling a **significant minority stake to Ashmore Group**, a stake they **later bought back**. Skenzo was subsequently folded into Media.net. That is a minority round that was later unwound, not an exit. |
+
+---
+
+## The claim the system refused to pass through
+
+**Refused: "Directi ... culminating in a $160M exit in 2014."**
+
+This one matters because it would have survived almost any verification method. It has more than two sources. It has sources in different countries. It appears in Forbes-adjacent trade press, on Wikipedia, on Directi's own LinkedIn company page and on the family's own websites. A dual-source check clears it instantly.
+
+It is still wrong. The buyer filed the number with the SEC and the number is $109.8M. Every one of those independent-looking sources is downstream of the same 2016 Inc42 and YourStory write-ups, which took it from the same place.
+
+The rule this produced: **for any transaction involving a listed company, the counterparty's filing outranks the entire rest of the internet, including the subject's own website.** Source count is not evidence. Source independence is, and independence has to be traced, not assumed.
+
+**Also held back for publication:** the 2023 Media.net SSP re-acquisition, and the "net worth over $1B at 33" line. Neither would be published under any circumstances until documented.
+
+---
+
+## The three biggest gaps in how he currently shows up
+
+**1. The verifiable record ends in 2018. The current venture has almost none.**
+Everything independently documented about him (the Media.net sale, the CEO handover, the Forbes and Hurun rankings, the CNBC profile) sits between 2014 and 2018. Ai.tech, founded January 2022 and now his primary vehicle, has essentially one independent press moment: the September 2025 Hurun unicorn list, which is itself company-supplied. He has 6,190 followers. For a man Hurun places among the hundred richest Indians, that is not a small presence, it is an absence. The public story reads in past tense, and it is the wrong tense for someone raising, hiring and partnering in AI right now.
+
+**2. The load-bearing superlatives are circular, and the circle closes on one press release.**
+"Top five ad tech company by market cap." "Second-largest contextual advertising business by revenue." "Third-largest ad-tech deal." All three trace to Media.net's own 2016 and 2018 communications. They have since been laundered through Wikipedia and a UAE government page, which makes them look independently sourced. They are not. Any counterparty who traces one traces all three, and the collapse takes the credible parts of the paragraph down with it. The fix is not to drop them. It is to attribute them and lead with the figures that survive scrutiny: $232M revenue in 2015, 800 to 1,300 employees, $900M consideration, all of which hold.
+
+**3. The profile contradicts itself, and contradicts his own companies' sites, in ways that read as carelessness at best.**
+Skenzo is 2005–2008 in the About and 2005–2018 in Experience. Media.net is 2010–2016 in the About and 2010–2018 in Experience. Net worth crosses $1B at 33 on LinkedIn and at 34 on directi.com. He is listed as "Founder" of Directi and of Radix while the body text of the same profile says co-founded, and while Radix's own site credits his brother as the one who started it. Forbes India has always ranked the brothers as one entry. In DIFC, where LPs and regulators run exactly this check, a unilateral "Founder" tag on a company his brother chairs is the highest-cost, lowest-benefit line on the page.
+
+---
+
+## Publishable set
+
+Safe to use in client content without further sourcing:
+
+- Co-founded Directi in 1998 at 16 with his brother, on about $500
+- Founded Media.net in 2010 in Dubai; sold it in 2016 for $900M
+- Media.net revenue was $232M in 2015; headcount grew from roughly 800 to over 1,300
+- Named youngest Indian billionaire on the Forbes list in 2016, 2017 and 2018
+- Founded Ai.tech in January 2022
+- Aerobatic pilot; Forbes called him a "thrillionaire"
+
+Requires attribution every time: any net worth figure, any Ai.tech headcount or valuation, any ranking of Media.net against competitors, the age milestones.
+
+Do not publish: the $160M Directi exit, the 2023 Media.net SSP re-acquisition, "$1B at 33", any Skenzo "exit."
