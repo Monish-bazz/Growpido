@@ -969,7 +969,7 @@
 
         .row-hit {
             display: grid;
-            grid-template-columns: 34px minmax(0, 1fr) 118px;
+            grid-template-columns: 34px minmax(0, 1fr) auto;
             gap: 16px;
             align-items: start;
             width: 100%;
@@ -979,7 +979,55 @@
             font: inherit;
             color: inherit;
             padding: 17px 4px;
-            cursor: pointer
+            cursor: pointer;
+        }
+
+        .row-side {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .copy-claim-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: 1px solid var(--rule);
+            border-radius: 2px;
+            padding: 4px 7px;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: all .2s var(--ease);
+            user-select: none;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .copy-claim-btn:hover {
+            background: var(--sheet);
+            border-color: var(--ink);
+            color: var(--ink);
+        }
+
+        .copy-claim-btn:active {
+            transform: scale(0.96);
+        }
+
+        .copy-claim-btn.copied {
+            border-color: var(--intaglio);
+            color: var(--intaglio);
+            background: rgba(31, 81, 53, 0.08);
+        }
+
+        .copy-claim-btn svg {
+            display: block;
+            width: 12px;
+            height: 12px;
         }
 
         .row-n {
@@ -1530,10 +1578,14 @@
                 gap: 10px
             }
 
-            .stamp {
+            .row-side {
                 grid-column: 2;
+                justify-content: flex-start;
+                margin-top: 10px;
+            }
+
+            .stamp {
                 justify-self: start;
-                margin-top: 10px
             }
 
             .row-inner {
@@ -1987,6 +2039,51 @@
                             : e.verdict === 'Contradicted'        ? ['held','CONTRADICTED']
                             :                                       ['attr','PARTIAL'];
 
+        function copyClaim(e, btn) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            const row = btn.closest('.row');
+            const claimEl = row ? row.querySelector('.row-claim') : null;
+            const text = (btn.getAttribute('data-claim') || (claimEl ? claimEl.textContent : '')).trim();
+            if (!text) { toast('No claim text found to copy', true); return; }
+
+            const setSuccess = () => {
+                toast('Claim copied');
+                btn.classList.add('copied');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg><span class="copy-tip">Copied</span>';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = orig;
+                }, 1800);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(setSuccess).catch(() => {
+                    fallbackCopy(text, setSuccess);
+                });
+            } else {
+                fallbackCopy(text, setSuccess);
+            }
+        }
+
+        function fallbackCopy(text, onSuccess) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                const ok = document.execCommand('copy');
+                document.body.removeChild(ta);
+                if (ok) onSuccess();
+                else toast('Copy failed', true);
+            } catch (_) {
+                toast('Copy failed', true);
+            }
+        }
+
         function rowHtml(e, i, key) {
             const b = bucketOf(e), [cls, label] = stampFor(e);
             const url = e.primary_source_url || '';
@@ -2010,13 +2107,16 @@
             const isNew = !shownRefs.has(key);
             shownRefs.add(key);
 
+            const copySvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            const copyBtn = '<button type="button" class="copy-claim-btn" title="Copy claim" aria-label="Copy claim" data-claim="' + esc(e.claim_text || '') + '" onclick="copyClaim(event, this)">' + copySvg + '<span class="copy-tip">Copy</span></button>';
+
             return '<div class="row" data-k="' + esc(key) + '">' +
-                '<button class="row-hit" aria-expanded="false">' +
+                '<div class="row-hit" role="button" tabindex="0" aria-expanded="false">' +
                 '<span class="row-n">' + String(i + 1).padStart(2, '0') + '</span>' +
                 '<span><span class="row-claim">' + esc(e.claim_text || '') + '</span>' +
                 (e.claim_type ? '<span class="row-type">' + esc(e.claim_type) + '</span>' : '') + '</span>' +
-                '<span class="stamp ' + cls + (isNew ? ' press' : '') + '">' + label + '</span>' +
-                '</button>' +
+                '<div class="row-side">' + copyBtn + '<span class="stamp ' + cls + (isNew ? ' press' : '') + '">' + label + '</span></div>' +
+                '</div>' +
                 '<div class="row-open"><div><div class="row-inner">' +
                 '<p class="finding">' + esc(e.reasoning || 'No reasoning recorded for this claim.') + '</p>' +
                 (span ? '<div class="evidence' + (cls === 'held' ? ' held' : '') + '">' + esc(span) + '</div>' : '') +
@@ -2026,9 +2126,18 @@
 
         function wireRows(root) {
             root.querySelectorAll('.row-hit').forEach(btn => {
-                btn.onclick = () => {
+                btn.onclick = (e) => {
+                    if (e.target.closest('.copy-claim-btn')) return;
                     const row = btn.closest('.row'), open = row.classList.toggle('open');
                     btn.setAttribute('aria-expanded', open);
+                };
+                btn.onkeydown = (e) => {
+                    if (e.target.closest('.copy-claim-btn')) return;
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const row = btn.closest('.row'), open = row.classList.toggle('open');
+                        btn.setAttribute('aria-expanded', open);
+                    }
                 };
             });
         }
@@ -2128,10 +2237,12 @@
                     const st = stampFor(verdicts[id], cache[id]);
                     const decided = !!verdicts[id];
                     const pulse = decided ? '' : '<span class="pulse"></span>';
+                    const copySvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                    const copyBtn = '<button type="button" class="copy-claim-btn" title="Copy claim" aria-label="Copy claim" data-claim="' + esc(text) + '" onclick="copyClaim(event, this)">' + copySvg + '<span class="copy-tip">Copy</span></button>';
                     return '<div class="row"><div class="row-hit" style="cursor:default">' +
                         '<span class="row-n">' + String(i + 1).padStart(2, '0') + '</span>' +
                         '<span><span class="row-claim">' + esc(text) + '</span><span class="row-type">' + esc(st.note) + '</span></span>' +
-                        '<span class="' + st.cls + '">' + pulse + st.label + '</span></div></div>';
+                        '<div class="row-side">' + copyBtn + '<span class="' + st.cls + '">' + pulse + st.label + '</span></div></div></div>';
                 }).join('') + '</div>';
         }
 
@@ -2383,6 +2494,8 @@
                 if (!DEMO) {
                     const r = await fetch('/feedback/' + threadId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ human_feedback: v }) });
                     if (!r.ok) throw new Error('Notes were not saved.');
+                    const d = await r.json();
+                    if (d.verification_ledger || d.refusal_log) renderLedger(d);
                 }
                 log('reviewer notes saved', 'ok');
                 toast('Notes saved. The brief has not been written yet.');

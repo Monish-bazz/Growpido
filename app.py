@@ -20,7 +20,11 @@ from graph import (
     GraphState,
     get_live_judge_progress,
     reset_live_judge_progress,
+    _get_nim_llm,
+    _parse_json_robust,
+    VerdictType
 )
+from langchain_core.messages import SystemMessage, HumanMessage
 
 load_dotenv()
 logging.basicConfig(
@@ -64,9 +68,18 @@ app = FastAPI(
 )
 
 @app.get("/ping")
+@app.head("/ping")
 async def ping():
-    """Keep-alive endpoint for Render / UptimeRobot."""
+    """Keep-alive endpoint for Render / UptimeRobot / Cron-job.org."""
     return {"status": "alive", "message": "Server is awake"}
+
+
+@app.get("/health")
+@app.head("/health")
+async def health():
+    """Lightweight health check endpoint for cronjobs & monitoring (<50 bytes)."""
+    return {"status": "ok"}
+
 
 
 
@@ -114,6 +127,70 @@ class SessionStatus(BaseModel):
 # =============================================================================
 
 from fastapi import BackgroundTasks
+
+def _apply_feedback_to_ledger(feedback: str, ledger: list, refusals: list):
+    if not feedback:
+        return ledger, refusals, False
+
+    all_claims = ledger + refusals
+    claims_text = ""
+    for i, claim in enumerate(all_claims):
+        claim_id = claim.get("index") or claim.get("claim_id") or str(i)
+        claims_text += f"[{claim_id}] Verdict: {claim.get('verdict')} | Claim: {claim.get('claim_text')}\n"
+
+    llm = _get_nim_llm(temperature=0.1, json_mode=True)
+    
+    sys_prompt = (
+        "You are assisting a human reviewer who is auditing an executive's reputation diagnostic.\n"
+        "The reviewer provides feedback in natural language, which may contain corrections, context, or verdict overrides.\n"
+        "If the reviewer explicitly overrides the status/verdict of a claim, identify the claim and its new verdict.\n"
+        "Valid verdicts: 'Verified', 'Partially Verified', 'Contradicted'.\n\n"
+        "Return ONLY a JSON object in this format:\n"
+        '{"edits": [{"claim_id": "...", "verdict": "Verified", "reasoning": "Human override reason"}]}\n'
+        "If no clear overrides are stated, return {'edits': []}."
+    )
+    user_prompt = (
+        f"Claims:\n{claims_text}\n\n"
+        f"Reviewer Feedback:\n{feedback}\n"
+    )
+
+    try:
+        resp = llm.invoke([SystemMessage(content=sys_prompt), HumanMessage(content=user_prompt)])
+        parsed = _parse_json_robust(resp.content, default={"edits": []})
+        if not isinstance(parsed, dict):
+            parsed = {"edits": []}
+        edits = parsed.get("edits", [])
+    except Exception as e:
+        logger.error(f"Failed to parse feedback: {e}")
+        edits = []
+
+    if not edits:
+        return ledger, refusals, False
+
+    new_ledger = []
+    new_refusals = []
+    changed = False
+    for entry in all_claims:
+        cid = str(entry.get("index") or entry.get("claim_id"))
+        
+        edit = next((e for e in edits if str(e.get("claim_id")) == cid), None)
+        if edit:
+            entry["verdict"] = edit.get("verdict", entry["verdict"])
+            entry["reasoning"] = edit.get("reasoning", "Human Override")
+            if entry["verdict"] == VerdictType.VERIFIED.value:
+                entry["bucket"] = "Publishable as written"
+            elif entry["verdict"] == VerdictType.PARTIALLY_VERIFIED.value:
+                entry["bucket"] = "Publishable with attribution"
+            else:
+                entry["bucket"] = "Blocked"
+            changed = True
+
+        if entry.get("bucket") in ["Publishable as written", "Publishable with attribution"]:
+            new_ledger.append(entry)
+        else:
+            new_refusals.append(entry)
+
+    return new_ledger, new_refusals, changed
 
 def run_pipeline(initial_state, config, thread_id):
     try:
@@ -261,6 +338,16 @@ async def approve_and_synthesize(thread_id: str, req: ApproveRequest):
     update = {"approved": True}
     if req.human_feedback:
         update["human_feedback"] = req.human_feedback
+        
+        snapshot = _graph.get_state(config)
+        state = snapshot.values
+        ledger = state.get("verification_ledger", [])
+        refusals = state.get("refusal_log", [])
+        
+        new_ledger, new_refusals, changed = _apply_feedback_to_ledger(req.human_feedback, ledger, refusals)
+        if changed:
+            update["verification_ledger"] = new_ledger
+            update["refusal_log"] = new_refusals
 
     if req.edits:
         snapshot = _graph.get_state(config)
@@ -338,18 +425,30 @@ class FeedbackRequest(BaseModel):
     human_feedback: str = ""
 
 
-@app.post("/feedback/{thread_id}")
+@app.post("/feedback/{thread_id}", response_model=SessionStatus)
 async def save_feedback(thread_id: str, req: FeedbackRequest):
     """
-    Save reviewer feedback WITHOUT triggering synthesis.
-    This only updates the human_feedback field in state.
+    Save reviewer feedback and apply any verdict overrides WITHOUT triggering synthesis.
     """
     if thread_id not in _sessions:
         raise HTTPException(status_code=404, detail="Session not found.")
     config = _sessions[thread_id]["config"]
-    _graph.update_state(config, {"human_feedback": req.human_feedback})
+    
+    snapshot = _graph.get_state(config)
+    state = snapshot.values
+    ledger = state.get("verification_ledger", [])
+    refusals = state.get("refusal_log", [])
+    
+    update = {"human_feedback": req.human_feedback}
+    
+    new_ledger, new_refusals, changed = _apply_feedback_to_ledger(req.human_feedback, ledger, refusals)
+    if changed:
+        update["verification_ledger"] = new_ledger
+        update["refusal_log"] = new_refusals
+
+    _graph.update_state(config, update)
     logger.info("[%s] Feedback saved (synthesis NOT triggered).", thread_id)
-    return {"status": "feedback_saved", "thread_id": thread_id}
+    return await get_status(thread_id)
 
 
 # =============================================================================
