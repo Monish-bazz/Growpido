@@ -10,6 +10,8 @@ import os
 import sys
 import logging
 import requests
+import re
+from urllib.parse import urlparse
 from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
@@ -69,6 +71,7 @@ class HybridResearcher:
     JINA_PREFIX = "https://r.jina.ai/"
     MAX_DEEP_CHARS = 3000          # cap per-page text to control token cost
     MAX_CITATIONS_TO_CRAWL = 3     # deep-dive into top N urls
+    PR_DOMAINS = {"prnewswire.com", "prweb.com", "globenewswire.com", "businesswire.com", "uniindia.com"}
 
     def __init__(
         self,
@@ -88,6 +91,53 @@ class HybridResearcher:
         if not self.tavily_key:
             logger.warning("TAVILY_API_KEY not set. Path B (Independent Search) will fail.")
 
+    def edgar_fulltext(self, query: str, forms: str = "10-Q,10-K,8-K,S-1") -> Optional[Dict[str, Any]]:
+        try:
+            r = requests.get(
+                "https://efts.sec.gov/LATEST/search-index",
+                params={"q": f'"{query}"', "forms": forms},
+                headers={"User-Agent": "Growpido Research contact@growpido.com"},
+                timeout=15
+            )
+            if r.status_code == 200:
+                return r.json()
+        except Exception as exc:
+            logger.error("EDGAR request failed: %s", exc)
+        return None
+
+    def build_queries(self, claim: dict) -> list[str]:
+        qs = [claim.get("text", "")]
+        cparty = claim.get("counterparty")
+        subj = claim.get("subject", "")
+        val = claim.get("value")
+        unit = claim.get("unit")
+        
+        if cparty:
+            qs.append(f"{cparty} {subj} acquisition purchase price")
+            qs.append(f"{cparty} SEC filing {subj}")
+        if val:
+            qs.append(f"{subj} {unit} actual amount reported")
+        qs.append(f"{claim.get('text', '')} disputed OR corrected OR actually")
+        return qs
+
+    def shingles(self, text: str, n: int = 8) -> set[str]:
+        words = re.findall(r"\w+", text.lower())
+        return {" ".join(words[i:i+n]) for i in range(max(1, len(words)-n+1))}
+
+    def same_origin(self, a: str, b: str, threshold: float = 0.25) -> bool:
+        sa, sb = self.shingles(a), self.shingles(b)
+        if not sa or not sb:
+            return False
+        return len(sa & sb) / max(1, min(len(sa), len(sb))) > threshold
+
+    def origin_tag(self, cluster: list, subject_domains: set[str]) -> str:
+        for c in cluster:
+            url = c.get("url", "")
+            host = urlparse(url).netloc.removeprefix("www.")
+            if host in self.PR_DOMAINS or host in subject_domains:
+                return "self_originating"
+        return "independent"
+
     # ------------------------------------------------------------------
     # Layer: Tavily (Independent Search Path B)
     # ------------------------------------------------------------------
@@ -98,7 +148,7 @@ class HybridResearcher:
         Independent Path B search using Tavily.
         """
         if not self.tavily_key or not _TAVILY_AVAILABLE:
-            return {"text": "Tavily layer disabled or missing key/package.", "citations": []}
+            return {"text": "Tavily layer disabled or missing key/package.", "citations": [], "content_map": {}}
             
         try:
             client = TavilyClient(api_key=self.tavily_key)
@@ -106,17 +156,27 @@ class HybridResearcher:
                 query=f"{executive_name} {claim}",
                 search_depth="advanced",
                 include_answer=True,
+                include_raw_content=True,
                 max_results=5,
             )
             
-            # Extract citations from results
-            citations = [res.get("url") for res in response.get("results", []) if res.get("url")]
+            citations = []
+            content_map = {}
+            for res in response.get("results", []):
+                url = res.get("url")
+                if url:
+                    citations.append(url)
+                    # Use raw_content if available, otherwise content
+                    content = res.get("raw_content") or res.get("content") or ""
+                    if content:
+                        content_map[url] = content[:self.MAX_DEEP_CHARS]
+
             text_answer = response.get("answer", "No synthesized answer returned from Tavily.")
             
-            return {"text": text_answer, "citations": citations}
+            return {"text": text_answer, "citations": citations, "content_map": content_map}
         except Exception as exc:
             logger.error("Tavily request failed: %s", exc)
-            return {"text": f"Search failed: {exc}", "citations": []}
+            return {"text": f"Search failed: {exc}", "citations": [], "content_map": {}}
 
     # ------------------------------------------------------------------
     # Layer 1: Perplexity sonar-pro
@@ -180,6 +240,148 @@ class HybridResearcher:
             return {"text": f"Search failed: {exc}", "citations": []}
 
     # ------------------------------------------------------------------
+    # Layer 1B: Perplexity BATCH fact-check (fallback for weak claims)
+    # ------------------------------------------------------------------
+    def batch_fact_check(
+        self, executive_name: str, claims: List[dict]
+    ) -> Dict[str, Any]:
+        """
+        Send ALL weak (unverified/contradicted) claims to Perplexity in ONE
+        call and ask for a per-claim verdict + source links.
+
+        `claims` is a list of {"id": str, "text": str}. Returns:
+          {
+            "<claim_id>": {"verdict": str, "confidence": str,
+                            "reasoning": str, "sources": [urls...]},
+            ...,
+            "_citations": [all urls returned],
+          }
+        Returns {} if Perplexity is disabled or the call fails.
+        """
+        # The batch fallback only needs a key — it is invoked explicitly by the
+        # graph's perplexity_fallback node (which owns the enable/disable flag),
+        # so it does NOT gate on self.use_perplexity (that flag controls the
+        # per-claim inline Perplexity during evidence gathering).
+        if not self.pplx_key:
+            logger.info("[PerplexityBatch] disabled (no PERPLEXITY_API_KEY).")
+            return {}
+        if not claims:
+            return {}
+
+        headers = {
+            "Authorization": f"Bearer {self.pplx_key}",
+            "Content-Type": "application/json",
+        }
+
+        numbered = "\n".join(
+            f'{i+1}. [id={c.get("id")}] {c.get("text","")}'
+            for i, c in enumerate(claims)
+        )
+
+        system_prompt = (
+            "You are a strict due-diligence fact-checker. For EACH numbered claim "
+            "about the named executive, search the web and decide a verdict using "
+            "primary/credible sources (regulatory filings, company registries, "
+            "named news outlets). Verdicts: Verified, Partially Verified, "
+            "Unverified, Contradicted. Be DECISIVE — do not default everything to "
+            "Partially Verified.\n"
+            "- Verified: TWO OR MORE independent credible sources (not copies of "
+            "each other) confirm the claim, including its number/date. Use this "
+            "confidently for well-documented facts.\n"
+            "- Partially Verified: the substance holds but a specific detail is off, "
+            "OR the only support is the subject's own site/press release/one origin. "
+            "Publishable WITH attribution.\n"
+            "- Contradicted: a credible source gives a DIFFERENT number, date, age, "
+            "or fact. If the claimed figure/age is wrong (e.g. wrong age, wrong "
+            "acquisition price), you MUST mark it Contradicted and state the correct "
+            "value in the reasoning. Do NOT mark it Verified or Partially Verified.\n"
+            "- Unverified: no credible evidence found.\n\n"
+            "Return ONLY a JSON object of this exact shape:\n"
+            '{"results":[{"id":"<claim id>","verdict":"...","confidence":"high|medium|low",'
+            '"reasoning":"one or two sentences naming the sources","sources":["url1","url2"]}]}\n'
+            "Include a real source URL for every non-Unverified verdict."
+        )
+        user_content = (
+            f"Executive: {executive_name}\n\nClaims to fact-check:\n{numbered}\n\n"
+            "Return the JSON object now."
+        )
+
+        payload = {
+            "model": "sonar",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_content},
+            ],
+            "temperature": 0.1,
+        }
+
+        logger.info("[PerplexityBatch] Fact-checking %d weak claims for %s in one call.",
+                    len(claims), executive_name)
+        try:
+            resp = requests.post(self.PPLX_ENDPOINT, json=payload, headers=headers, timeout=90)
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"] or ""
+            citations = data.get("citations", []) or []
+            logger.info("[PerplexityBatch] RETURNED %d chars, %d citations.",
+                        len(content), len(citations))
+            logger.info("[PerplexityBatch] ANSWER: %s", content[:1000])
+            if citations:
+                logger.info("[PerplexityBatch] CITATIONS: %s", " | ".join(citations[:12]))
+
+            # Parse the per-claim JSON (best-effort, tolerant of fences/preamble).
+            parsed = self._extract_json(content)
+            out: Dict[str, Any] = {"_citations": citations}
+            results = []
+            if isinstance(parsed, dict):
+                results = parsed.get("results") or []
+            elif isinstance(parsed, list):
+                results = parsed
+            for r in results:
+                if not isinstance(r, dict):
+                    continue
+                cid = str(r.get("id", "")).strip()
+                if not cid:
+                    continue
+                out[cid] = {
+                    "verdict": r.get("verdict", "Unverified"),
+                    "confidence": r.get("confidence", "low"),
+                    "reasoning": r.get("reasoning", ""),
+                    "sources": r.get("sources", []) or [],
+                }
+            logger.info("[PerplexityBatch] Parsed verdicts for %d claims.",
+                        len([k for k in out if k != "_citations"]))
+            return out
+        except Exception as exc:
+            logger.error("[PerplexityBatch] failed: %s", exc)
+            return {}
+
+    @staticmethod
+    def _extract_json(text: str) -> Any:
+        """Tolerant JSON extraction from a model response (fences/preamble)."""
+        import json as _json
+        if not text:
+            return None
+        t = text.strip()
+        if "```json" in t:
+            t = t.split("```json", 1)[1].split("```", 1)[0].strip()
+        elif "```" in t:
+            parts = t.split("```")
+            if len(parts) >= 3:
+                t = parts[1].strip()
+        try:
+            return _json.loads(t)
+        except Exception:
+            pass
+        s, e = t.find("{"), t.rfind("}")
+        if s != -1 and e > s:
+            try:
+                return _json.loads(t[s:e + 1])
+            except Exception:
+                return None
+        return None
+
+    # ------------------------------------------------------------------
     # Layer 2: SerpAPI Google AI Mode
     # ------------------------------------------------------------------
     def run_google_ai_mode(
@@ -200,6 +402,8 @@ class HybridResearcher:
         try:
             client = serpapi.Client(api_key=self.serpapi_key)
             query = f"Verify: {executive_name} {claim}"
+
+            logger.info("[GoogleAIMode] QUERY: %s", query)
 
             results = client.search({
                 "engine": "google_ai_mode",
@@ -238,9 +442,17 @@ class HybridResearcher:
                     organic_urls.append(link)
 
             logger.info(
-                "Google AI Mode returned %d chars, %d citations, %d organic URLs.",
+                "[GoogleAIMode] RETURNED %d chars, %d citations, %d organic URLs.",
                 len(ai_answer), len(ai_citations), len(organic_urls),
             )
+            # Deep logging: show exactly what Google AI Mode said and which
+            # links it grounded the answer on.
+            if ai_answer:
+                logger.info("[GoogleAIMode] ANSWER: %s", ai_answer[:800])
+            if ai_citations:
+                logger.info("[GoogleAIMode] CITATIONS: %s", " | ".join(ai_citations[:8]))
+            if organic_urls:
+                logger.info("[GoogleAIMode] ORGANIC: %s", " | ".join(organic_urls[:8]))
 
             return {
                 "ai_answer": ai_answer,
@@ -249,7 +461,7 @@ class HybridResearcher:
             }
 
         except Exception as exc:
-            logger.error("SerpAPI Google AI Mode failed: %s", exc)
+            logger.error("SerpAPI Google AI Mode failed for query %r: %s", query, exc)
             return {"ai_answer": "", "citations": [], "organic_urls": []}
 
     # ------------------------------------------------------------------
@@ -271,10 +483,10 @@ class HybridResearcher:
         try:
             client = serpapi.Client(api_key=self.serpapi_key)
 
-            query = f"Who is {executive_name} research in deep and extract deep details"
+            query = f"Provide a detailed and comprehensive biography of {executive_name}"
             if company:
-                query += f" {company}"
-            query += "? Background, career, achievements, and public record. -site:linkedin.com"
+                query += f", primarily known for {company}"
+            query += ". Describe their full career history, major professional achievements, public reputation, controversies, and key business milestones in detail. -site:linkedin.com"
 
             results = client.search({
                 "engine": "google_ai_mode",
@@ -389,101 +601,77 @@ class HybridResearcher:
         return text
 
     def verify_claim(
-        self, claim: str, executive_name: str
+        self, claim: dict, executive_name: str
     ) -> Dict[str, Any]:
         """
-        Dual-source corroboration pipeline.
-
-        Path A: SerpAPI Google AI Mode (primary AI fact-checker)
-        Path B: Tavily (independent search with different index)
-        Path C: Perplexity (optional 3rd independent check)
-        Deep Crawl: Agent Reach crawls ONLY Path B URLs that are NOT in Path A,
-                    guaranteeing truly independent source inspection.
-
-        Returns:
-            {
-                "summary": str,
-                "citations": List[str],
-                "google_ai_answer": str,
-                "google_ai_citations": List[str],
-                "perplexity_answer": str,
-                "perplexity_citations": List[str],
-                "tavily_answer": str,
-                "tavily_citations": List[str],
-                "deep_evidence": List[dict],
-                "source_pools": {
-                    "pool_a": List[str],   # Google AI Mode sources
-                    "pool_b": List[str],   # Tavily + Agent Reach sources
-                }
-            }
+        Gather evidence using multiple query shapes.
         """
-        # ---- Path A: Google AI Mode (primary fact-checker) ----
-        google_result = self.run_google_ai_mode(claim, executive_name)
-        pool_a_urls = list(google_result["citations"] + google_result["organic_urls"])
+        queries = self.build_queries(claim)
+        
+        all_citations = []
+        google_ai_answers = []
+        tavily_answers = []
+        tavily_content_cache = {}
+        pool_a_urls = []
+        pool_b_urls_raw = []
 
-        # ---- Path B: Tavily (independent search engine) ----
-        tavily_result = self.run_tavily_search(claim, executive_name)
-        pool_b_urls_raw = list(tavily_result["citations"])
+        for q in queries:
+            g_res = self.run_google_ai_mode(q, executive_name)
+            pool_a_urls.extend(g_res["citations"] + g_res["organic_urls"])
+            if g_res["ai_answer"]:
+                google_ai_answers.append(g_res["ai_answer"])
+            
+            t_res = self.run_tavily_search(q, executive_name)
+            pool_b_urls_raw.extend(t_res["citations"])
+            if t_res["text"]:
+                tavily_answers.append(t_res["text"])
+            if "content_map" in t_res:
+                tavily_content_cache.update(t_res["content_map"])
 
-        # KEY DESIGN: Exclude Path A URLs from Path B to guarantee independence
-        pool_a_domains = set()
-        for u in pool_a_urls:
-            try:
-                from urllib.parse import urlparse
-                pool_a_domains.add(urlparse(u).netloc.lower())
-            except Exception:
-                pass
+        # De-duplicate URLs
+        pool_a_urls = list(set(pool_a_urls))
+        pool_b_urls_raw = list(set(pool_b_urls_raw))
+        all_citations = list(set(pool_a_urls + pool_b_urls_raw))
 
-        independent_urls = []
-        for u in pool_b_urls_raw:
-            try:
-                from urllib.parse import urlparse
-                domain = urlparse(u).netloc.lower()
-                if domain not in pool_a_domains and "linkedin.com" not in domain:
-                    independent_urls.append(u)
-            except Exception:
-                if u not in pool_a_urls and "linkedin.com" not in u.lower():
-                    independent_urls.append(u)
-
-        # ---- Deep Crawl: Only independent (Path B) URLs via Agent Reach ----
         deep_evidence: List[Dict[str, str]] = []
-        urls_to_crawl = independent_urls[: self.MAX_CITATIONS_TO_CRAWL]
+        urls_to_crawl = all_citations[: self.MAX_CITATIONS_TO_CRAWL]
 
         for url in urls_to_crawl:
-            page_text = self.deep_crawl_url(url)
-            if page_text:
-                deep_evidence.append({"url": url, "text": page_text})
+            if url in tavily_content_cache:
+                deep_evidence.append({"url": url, "text": tavily_content_cache[url]})
+            else:
+                page_text = self.deep_crawl_url(url)
+                if page_text:
+                    deep_evidence.append({"url": url, "text": page_text})
 
-        # ---- Path C: Perplexity (Optional) ----
         pplx_result = {"text": "", "citations": []}
         if self.use_perplexity:
-            pplx_result = self.run_perplexity_search(claim, executive_name)
+            # use the primary confirm query for perplexity to save time
+            pplx_result = self.run_perplexity_search(queries[0], executive_name)
+            all_citations.extend(pplx_result["citations"])
+            all_citations = list(set(all_citations))
 
-        # Merge all unique citation URLs for reference
-        all_citations = list(pool_a_urls)
-        for url in pool_b_urls_raw + pplx_result["citations"]:
-            if url not in all_citations:
-                all_citations.append(url)
-
-        pool_b_final = list(set(independent_urls + pool_b_urls_raw))
-
+        claim_txt = claim.get("text", "") if isinstance(claim, dict) else str(claim)
         logger.info(
-            "Dual-source verification: Pool A has %d sources, Pool B has %d sources (%d independent deep-crawled).",
-            len(pool_a_urls), len(pool_b_final), len(deep_evidence),
+            "[Evidence] claim=%r | %d queries | %d total URLs | %d deep-crawled",
+            claim_txt[:80], len(queries), len(all_citations), len(deep_evidence)
         )
+        if all_citations:
+            logger.info("[Evidence] URLs: %s", " | ".join(all_citations[:10]))
 
         return {
-            "summary": tavily_result["text"] + "\n\n" + pplx_result["text"],
+            "summary": "\n".join(tavily_answers) + "\n\n" + pplx_result["text"],
             "citations": all_citations,
-            "google_ai_answer": google_result["ai_answer"],
-            "google_ai_citations": google_result["citations"],
-            "tavily_answer": tavily_result["text"],
-            "tavily_citations": tavily_result["citations"],
+            "google_ai_answer": "\n".join(google_ai_answers),
+            "google_ai_citations": pool_a_urls,
+            "tavily_answer": "\n".join(tavily_answers),
+            "tavily_citations": pool_b_urls_raw,
             "perplexity_answer": pplx_result["text"],
             "perplexity_citations": pplx_result["citations"],
             "deep_evidence": deep_evidence,
+            "queries_run": queries,
             "source_pools": {
                 "pool_a": pool_a_urls,
-                "pool_b": pool_b_final,
+                "pool_b": pool_b_urls_raw,
             },
         }

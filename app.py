@@ -15,7 +15,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 
-from graph import compile_graph, GraphState
+from graph import (
+    compile_graph,
+    GraphState,
+    get_live_judge_progress,
+    reset_live_judge_progress,
+)
 
 load_dotenv()
 logging.basicConfig(
@@ -58,6 +63,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+@app.get("/ping")
+async def ping():
+    """Keep-alive endpoint for Render / UptimeRobot."""
+    return {"status": "alive", "message": "Server is awake"}
+
+
 
 # =============================================================================
 # Request/Response Models
@@ -75,6 +86,11 @@ class ApproveRequest(BaseModel):
 class SessionStatus(BaseModel):
     thread_id: str
     status: str
+    phase: Optional[str] = None
+    evidence_ready: Optional[int] = None
+    claims_count: Optional[int] = None
+    live_verdicts: Optional[list] = None
+    judged_count: Optional[int] = None
     executive_name: Optional[str] = None
     headline: Optional[str] = None
     profile_text: Optional[str] = None
@@ -160,15 +176,52 @@ async def get_status(thread_id: str):
     ledger = state.get("verification_ledger", [])
     refusals = state.get("refusal_log", [])
     profile_text = state.get("profile_text", "")
+    claims = state.get("claims", [])
+    evidence_cache = state.get("evidence_cache", {})
     headline = ""
     for line in profile_text.split("\n"):
         if line.startswith("Headline:"):
             headline = line.replace("Headline:", "").strip()
             break
 
+    # Derive a human-readable phase so the UI can narrate long-running work
+    # (evidence gathering and judging happen inside single graph nodes and are
+    # otherwise invisible to the client until the whole run pauses for review).
+    session_status = _sessions[thread_id]["status"]
+    evidence_ready = len(evidence_cache)
+
+    # Live per-claim verdicts streamed from the judge node (partial while judging).
+    live_map = get_live_judge_progress(thread_id)
+    live_verdicts = list(live_map.values()) if live_map else []
+    judged_count = len(live_verdicts)
+
+    if session_status in ("pending_review", "completed", "error"):
+        phase = session_status
+    elif ledger or refusals:
+        phase = "categorizing"
+    elif claims and judged_count > 0:
+        phase = "judging"
+    elif claims and evidence_ready >= len(claims) and len(claims) > 0:
+        phase = "judging"
+    elif claims and evidence_ready > 0:
+        phase = "gathering_evidence"
+    elif claims:
+        phase = "extracting_claims"
+    elif profile_text and state.get("google_person_context"):
+        phase = "researching_context"
+    elif profile_text:
+        phase = "profile_ready"
+    else:
+        phase = "ingesting_profile"
+
     return SessionStatus(
         thread_id=thread_id,
-        status=_sessions[thread_id]["status"],
+        status=session_status,
+        phase=phase,
+        evidence_ready=evidence_ready,
+        claims_count=len(claims),
+        live_verdicts=live_verdicts,
+        judged_count=judged_count,
         executive_name=state.get("executive_name"),
         headline=headline,
         profile_text=profile_text,
@@ -208,6 +261,38 @@ async def approve_and_synthesize(thread_id: str, req: ApproveRequest):
     update = {"approved": True}
     if req.human_feedback:
         update["human_feedback"] = req.human_feedback
+
+    if req.edits:
+        snapshot = _graph.get_state(config)
+        state = snapshot.values
+        ledger = state.get("verification_ledger", [])
+        refusals = state.get("refusal_log", [])
+        
+        all_entries = ledger + refusals
+        new_ledger = []
+        new_refusals = []
+        
+        # apply edits
+        for entry in all_entries:
+            for edit in req.edits:
+                if entry.get("index") == edit.get("claim_id") or str(entry.get("index")) == str(edit.get("claim_id")):
+                    entry["verdict"] = edit.get("verdict", entry["verdict"])
+                    entry["reasoning"] = edit.get("reasoning", "Human Override")
+                    # Re-bucket based on edit
+                    if entry["verdict"] == "Verified":
+                        entry["bucket"] = "Publishable as written"
+                    elif entry["verdict"] == "Partially Verified":
+                        entry["bucket"] = "Publishable with attribution"
+                    else:
+                        entry["bucket"] = "Blocked"
+            
+            if entry.get("bucket") in ["Publishable as written", "Publishable with attribution"]:
+                new_ledger.append(entry)
+            else:
+                new_refusals.append(entry)
+                
+        update["verification_ledger"] = new_ledger
+        update["refusal_log"] = new_refusals
 
     try:
         logger.info("[%s] Human approved. Updating state.", thread_id)

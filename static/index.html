@@ -1,834 +1,2446 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Growpido Track B | Executive Reputation Diagnostic</title>
-    <meta name="description" content="AI-powered executive reputation diagnostic engine.">
+    <title>Executive Reputation Diagnostic — Growpido</title>
+    <meta name="description" content="Every claim on a profile, checked against a source we can name.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Public+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
-        :root{--bg:#070b14;--bg2:#0d1424;--glass:rgba(13,20,36,0.6);--glass2:rgba(255,255,255,0.03);--border:rgba(99,102,241,0.12);--border-hi:rgba(99,102,241,0.35);--text:#f0f4ff;--text2:#8b9ec7;--text3:#4a5980;--indigo:#818cf8;--violet:#a78bfa;--cyan:#22d3ee;--emerald:#34d399;--amber:#fbbf24;--rose:#fb7185;--red:#f87171;--grad:linear-gradient(135deg,#818cf8,#a78bfa 50%,#22d3ee);--shadow:0 24px 64px -16px rgba(0,0,0,0.6);--glow:0 0 48px rgba(99,102,241,0.12);--r-sm:10px;--r-md:14px;--r-lg:18px;--r-xl:22px;--r-pill:999px;--ease:cubic-bezier(0.4,0,0.2,1);--li-bg:#f3f2ef;--li-card:#ffffff;--li-text:#191919;--li-text-mut:#666666;--li-blue:#0a66c2;--li-border:#e0e0e0;}
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-        .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 900px 700px at 15% 15%,rgba(99,102,241,0.07),transparent),radial-gradient(ellipse 700px 500px at 85% 85%,rgba(167,139,250,0.05),transparent)}
-        .shell{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:36px 24px 80px}
-        .header{text-align:center;margin-bottom:52px}
-        .pill{display:inline-flex;align-items:center;gap:8px;padding:5px 16px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r-pill);font-size:11px;font-weight:600;color:var(--indigo);letter-spacing:.08em;text-transform:uppercase;margin-bottom:22px;backdrop-filter:blur(12px)}
-        .pill-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:blink 2s infinite}
-        @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-        .header h1{font-size:40px;font-weight:900;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
-        .header p{font-size:15px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.65}
-        .input-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 32px;backdrop-filter:blur(20px);box-shadow:var(--shadow);margin-bottom:28px;transition:border-color .3s}
-        .input-card:hover{border-color:var(--border-hi)}
-        .input-label{display:block;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-        .input-row{display:flex;gap:10px}
-        .url-input{flex:1;padding:13px 18px;background:rgba(7,11,20,0.8);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .2s}
-        .url-input:focus{border-color:var(--indigo);box-shadow:0 0 0 3px rgba(129,140,248,0.1)}
-        .url-input::placeholder{color:var(--text3)}
-        .btn{padding:13px 28px;background:var(--grad);border:none;border-radius:var(--r-md);color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s var(--ease);white-space:nowrap}
-        .btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.35)}
-        .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
-        .btn-outline{padding:11px 24px;background:transparent;border:1px solid var(--emerald);border-radius:var(--r-md);color:var(--emerald);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-        .btn-outline:hover{background:rgba(52,211,153,.08)}
-        .btn-outline:disabled{opacity:.4;cursor:not-allowed}
-        .btn-danger{padding:11px 24px;background:transparent;border:1px solid var(--rose);border-radius:var(--r-md);color:var(--rose);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
-        .btn-danger:hover{background:rgba(251,113,133,.08)}
-        .btn-copy{padding:10px 22px;background:var(--glass2);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text2);font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s}
-        .btn-copy:hover{border-color:var(--border-hi);color:var(--text)}
-        
-        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes profileReveal{from{opacity:0;transform:scale(.97) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes itemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
-        
-        #scanScreen{display:none}
-        #scanScreen.active{display:block}
-        .scan-header{display:flex;align-items:center;gap:16px;padding:20px 28px;background:var(--glass);border:1px solid var(--border);border-radius:var(--r-lg);backdrop-filter:blur(16px);margin-bottom:24px;animation:fadeUp .5s var(--ease) both}
-        .scan-spinner{width:36px;height:36px;flex-shrink:0;border:3px solid rgba(129,140,248,.15);border-top-color:var(--indigo);border-radius:50%;animation:spin .8s linear infinite}
-        .scan-info h3{font-size:15px;font-weight:700;margin-bottom:2px}
-        .scan-info p{font-size:13px;color:var(--text2)}
-        .scan-stages{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-        .stage-row{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--glass2);border:1px solid var(--border);border-radius:var(--r-md);font-size:13px;color:var(--text3);transition:all .3s var(--ease);animation:fadeUp .4s var(--ease) both}
-        .stage-row:nth-child(1){animation-delay:.05s}.stage-row:nth-child(2){animation-delay:.1s}.stage-row:nth-child(3){animation-delay:.15s}.stage-row:nth-child(4){animation-delay:.2s}.stage-row:nth-child(5){animation-delay:.25s}
-        .stage-row.active{border-color:rgba(129,140,248,.3);background:rgba(99,102,241,.06);color:var(--indigo)}
-        .stage-row.done{color:var(--emerald);border-color:rgba(52,211,153,.2)}
-        .stage-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-        .stage-name{flex:1;font-weight:500}
-        .stage-status{font-size:11px;font-family:'JetBrains Mono',monospace}
-        .stage-row.active .stage-status{color:var(--indigo)}.stage-row.done .stage-status{color:var(--emerald)}
-        
-        /* Mobile Phone UI Styles */
-        #profileCard{display:none; gap: 32px; flex-wrap: wrap;}
-        #profileCard.active{display:flex; justify-content:center; align-items:flex-start; animation:profileReveal .6s var(--ease) both}
-        
-        .side-panel {
-            flex: 1;
-            min-width: 300px;
-            max-width: 400px;
+        :root {
+            /* Security-document palette: bond paper, intaglio inks */
+            --bond: #E7E9E0;
+            --bond-deep: #DCDFD3;
+            --sheet: #F4F5EF;
+            --rule: #C3C8B6;
+            --rule-soft: #D6DACB;
+            --ink: #16211C;
+            --ink-mid: #4B5A50;
+            --ink-soft: #77857A;
+            --intaglio: #1F5135;
+            /* cleared */
+            --steel: #3B5F79;
+            /* needs attribution */
+            --ledger: #8E2B21;
+            /* held back */
+            --stamp-ghost: rgba(22, 33, 28, .06);
+
+            --phone-shell: #191C19;
+            --li-bg: #F3F2EF;
+            --li-card: #FFFFFF;
+            --li-text: #1B1B1B;
+            --li-mut: #666666;
+            --li-blue: #0A66C2;
+            --li-rule: #E4E2DE;
+
+            --sans: 'Public Sans', system-ui, sans-serif;
+            --serif: 'Bodoni Moda', Georgia, serif;
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
+            --ease: cubic-bezier(.22, .61, .36, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: var(--sans);
+            background: var(--bond);
+            color: var(--ink);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* faint engraved fibre texture, like bond stock */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .5;
+            background-image:
+                repeating-linear-gradient(0deg, transparent 0 3px, rgba(22, 33, 28, .012) 3px 4px),
+                repeating-linear-gradient(90deg, transparent 0 3px, rgba(22, 33, 28, .012) 3px 4px);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--intaglio);
+            outline-offset: 3px
+        }
+
+        /* ─── pipeline progress hairline ─────────────────────────── */
+        #progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            width: 0;
+            background: var(--intaglio);
+            z-index: 90;
+            transition: width .9s var(--ease)
+        }
+
+        /* ─── layout ─────────────────────────────────────────────── */
+        .frame {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 250px minmax(0, 1fr);
+            gap: 0;
+            max-width: 1240px;
+            margin: 0 auto
+        }
+
+        /* ─── audit trail spine ──────────────────────────────────── */
+        .spine {
+            position: sticky;
+            top: 0;
+            align-self: start;
+            height: 100vh;
+            border-right: 1px solid var(--rule);
+            padding: 28px 22px 24px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
         }
-        
-        .phone-frame {
-            width: 375px;
-            height: 812px;
-            background: #000;
-            border-radius: 40px;
-            border: 8px solid #1a1a2e;
-            box-shadow: 0 0 0 2px #3a3a5e, 0 24px 48px rgba(0,0,0,0.8), var(--glow);
+
+        .spine-mark {
+            font-family: var(--serif);
+            font-size: 19px;
+            line-height: 1.15;
+            letter-spacing: -.01em
+        }
+
+        .spine-mark span {
+            display: block;
+            font-family: var(--sans);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .14em;
+            color: var(--ink-soft);
+            margin-top: 7px
+        }
+
+        .spine-hr {
+            height: 1px;
+            background: var(--rule);
+            margin: 20px 0 16px
+        }
+
+        .spine-h {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .1em;
+            color: var(--ink-soft);
+            margin-bottom: 12px
+        }
+
+        #trail {
+            flex: 1;
+            overflow-y: auto;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            line-height: 1.55;
+            color: var(--ink-mid);
+            scrollbar-width: thin;
+            mask-image: linear-gradient(to bottom, transparent, #000 14px)
+        }
+
+        #trail::-webkit-scrollbar {
+            width: 3px
+        }
+
+        #trail::-webkit-scrollbar-thumb {
+            background: var(--rule)
+        }
+
+        /* ─── live work banner (keeps the reviewer engaged) ─────── */
+        .work-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--rule);
+            background: var(--sheet);
+            padding: 16px 20px;
+            margin-bottom: 26px;
+        }
+
+        .work-banner[hidden] { display: none }
+
+        .work-spin {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            border: 2px solid var(--rule);
+            border-top-color: var(--intaglio);
+            border-radius: 50%;
+            animation: work-rot .9s linear infinite;
+        }
+
+        @keyframes work-rot { to { transform: rotate(360deg) } }
+
+        .work-body { flex: 1; min-width: 0 }
+
+        .work-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ink);
+            letter-spacing: .01em;
+        }
+
+        .work-sub {
+            font-size: 12.5px;
+            color: var(--ink-soft);
+            margin: 2px 0 9px;
+        }
+
+        .work-track {
+            height: 4px;
+            background: var(--bond-deep);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .work-fill {
+            height: 100%;
+            width: 0;
+            background: var(--intaglio);
+            border-radius: 2px;
+            transition: width .6s var(--ease);
+        }
+
+        .work-meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-mid);
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .loader-dots::after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        .tr {
+            display: grid;
+            grid-template-columns: 52px 1fr;
+            gap: 8px;
+            padding: 3px 0;
+            opacity: 0;
+            animation: trIn .4s var(--ease) forwards
+        }
+
+        @keyframes trIn {
+            from {
+                opacity: 0;
+                transform: translateY(-3px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .tr b {
+            font-weight: 400;
+            color: var(--ink-soft)
+        }
+
+        .tr.ok i {
+            color: var(--intaglio);
+            font-style: normal
+        }
+
+        .tr.warn i {
+            color: var(--ledger);
+            font-style: normal
+        }
+
+        .spine-foot {
+            padding-top: 14px;
+            border-top: 1px solid var(--rule);
+            font-size: 11px;
+            color: var(--ink-soft);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px
+        }
+
+        .spine-foot b {
+            font-family: var(--mono);
+            font-weight: 500;
+            color: var(--ink)
+        }
+
+        /* ─── acts ───────────────────────────────────────────────── */
+        .col {
+            padding: 0 clamp(20px, 4vw, 64px)
+        }
+
+        .act {
+            padding: 64px 0;
+            border-bottom: 1px solid var(--rule-soft)
+        }
+
+        .act:last-child {
+            border-bottom: none
+        }
+
+        .act[hidden] {
+            display: none
+        }
+
+        .act-head {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 8px
+        }
+
+        .act-head h2 {
+            font-family: var(--serif);
+            font-size: clamp(26px, 3.4vw, 38px);
+            font-weight: 400;
+            letter-spacing: -.015em;
+            line-height: 1.1
+        }
+
+        .act-head .n {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            padding-top: 6px
+        }
+
+        .act-sub {
+            color: var(--ink-mid);
+            max-width: 62ch;
+            margin-bottom: 34px;
+            font-size: 15px
+        }
+
+        /* ─── intake / hero ──────────────────────────────────────── */
+        #act-intake {
+            padding: 0;
+            border-bottom: 1px solid var(--rule)
+        }
+
+        .hero {
+            position: relative;
+            min-height: min(92vh, 760px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 0
+        }
+
+        .rosette {
+            position: absolute;
+            right: -140px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 620px;
+            height: 620px;
+            pointer-events: none;
+            opacity: .26
+        }
+
+        .rosette path {
+            fill: none;
+            stroke: var(--intaglio);
+            stroke-width: .4
+        }
+
+        .rosette .g1 {
+            animation: rot 190s linear infinite
+        }
+
+        .rosette .g2 {
+            animation: rot 130s linear infinite reverse
+        }
+
+        @keyframes rot {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .hero-in {
+            position: relative;
+            z-index: 2;
+            max-width: 640px
+        }
+
+        .hero h1 {
+            font-family: var(--serif);
+            font-size: clamp(42px, 6.4vw, 78px);
+            font-weight: 400;
+            line-height: 1.0;
+            letter-spacing: -.03em;
+            margin-bottom: 26px
+        }
+
+        .hero h1 em {
+            font-style: italic
+        }
+
+        .hero p {
+            font-size: 17px;
+            color: var(--ink-mid);
+            max-width: 50ch;
+            margin-bottom: 40px
+        }
+
+        .lede {
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise .9s var(--ease) forwards
+        }
+
+        .lede.d1 {
+            animation-delay: .12s
+        }
+
+        .lede.d2 {
+            animation-delay: .26s
+        }
+
+        .lede.d3 {
+            animation-delay: .40s
+        }
+
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .intake {
+            display: flex;
+            gap: 10px;
+            max-width: 620px;
+            margin-bottom: 22px
+        }
+
+        .field {
+            flex: 1;
+            position: relative
+        }
+
+        .field input {
+            width: 100%;
+            padding: 16px 18px 15px;
+            background: var(--sheet);
+            border: 1px solid var(--rule);
+            border-bottom: 2px solid var(--ink);
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--ink);
+            outline: none;
+            transition: background .2s, border-color .2s;
+        }
+
+        .field input::placeholder {
+            color: var(--ink-soft)
+        }
+
+        .field input:focus {
+            background: #fff;
+            border-bottom-color: var(--intaglio)
+        }
+
+        .go {
+            padding: 16px 30px;
+            background: var(--ink);
+            color: var(--bond);
+            border: 1px solid var(--ink);
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+            white-space: nowrap;
+        }
+
+        .go:hover:not(:disabled) {
+            background: var(--intaglio);
+            border-color: var(--intaglio)
+        }
+
+        .go:disabled {
+            opacity: .4;
+            cursor: not-allowed
+        }
+
+        .rules {
+            font-size: 13px;
+            color: var(--ink-soft);
+            max-width: 54ch
+        }
+
+        .rules b {
+            color: var(--ink-mid);
+            font-weight: 600
+        }
+
+        /* ─── subject / phone ────────────────────────────────────── */
+        .subject {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: clamp(24px, 4vw, 52px);
+            align-items: start
+        }
+
+        .phone-col {
+            position: sticky;
+            top: 44px
+        }
+
+        .phone {
+            width: 338px;
+            height: 706px;
+            background: var(--phone-shell);
+            border-radius: 42px;
+            padding: 9px;
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .14) inset, 0 26px 50px -22px rgba(22, 33, 28, .55);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 24px;
         }
-        
-        .phone-notch {
+
+        .phone::after {
+            content: '';
             position: absolute;
-            top: 0;
+            top: 9px;
             left: 50%;
             transform: translateX(-50%);
-            width: 150px;
-            height: 30px;
-            background: #1a1a2e;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            z-index: 100;
+            width: 112px;
+            height: 26px;
+            background: var(--phone-shell);
+            border-radius: 0 0 16px 16px;
+            z-index: 12
         }
-        
-        .phone-content {
-            flex: 1;
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 34px;
             background: var(--li-bg);
             overflow-y: auto;
             overflow-x: hidden;
             color: var(--li-text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding-bottom: 20px;
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+            scrollbar-width: none
         }
-        
-        /* Hide scrollbar for phone-content */
-        .phone-content::-webkit-scrollbar { width: 0; }
-        .phone-content { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        .li-card {
-            background: var(--li-card);
-            margin-bottom: 8px;
-            padding: 16px;
+
+        .screen::-webkit-scrollbar {
+            width: 0
         }
-        
-        .li-banner {
-            height: 100px;
-            background: linear-gradient(135deg, #a0b4c7, #e0e7ed);
-            position: relative;
+
+        .phone-cap {
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            text-align: center;
+            margin-top: 14px;
+            font-family: var(--mono)
         }
-        
-        .li-photo-wrapper {
-            position: absolute;
-            bottom: -40px;
-            left: 16px;
-            width: 104px;
-            height: 104px;
-            border-radius: 50%;
-            border: 4px solid var(--li-card);
-            background: #fff;
-            overflow: hidden;
-        }
-        
-        .li-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .li-profile-top {
-            padding-top: 50px;
-        }
-        
-        .li-name {
-            font-size: 24px;
+
+        .sbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px 6px;
+            font-size: 12px;
             font-weight: 600;
-            line-height: 1.2;
-            margin-bottom: 4px;
+            background: var(--li-card)
+        }
+
+        .sbar .r {
+            display: flex;
+            gap: 5px;
+            align-items: center
+        }
+
+        .sbar svg {
+            display: block
+        }
+
+        .linav {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            padding: 6px 12px 10px;
+            background: var(--li-card);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid var(--li-rule)
         }
-        
-        .li-verified {
-            color: var(--li-text-mut);
-            font-size: 14px;
+
+        .liav {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #c8ccd4;
+            overflow: hidden;
+            flex-shrink: 0
         }
-        
-        .li-headline {
-            font-size: 15px;
-            color: var(--li-text);
-            margin-bottom: 12px;
-            line-height: 1.4;
+
+        .liav img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
         }
-        
-        .li-location {
+
+        .lisearch {
+            flex: 1;
+            background: #EDF3F8;
+            border-radius: 4px;
+            padding: 6px 10px;
             font-size: 13px;
-            color: var(--li-text-mut);
-            margin-bottom: 12px;
+            color: #5f6b76
         }
-        
-        .li-connections {
+
+        .licard {
+            background: var(--li-card);
+            margin-bottom: 8px
+        }
+
+        .libanner {
+            height: 96px;
+            background: linear-gradient(118deg, #243b4a, #4c6f7f 55%, #8fa6a4);
+            position: relative;
+            background-size: cover;
+            background-position: center
+        }
+
+        .liphoto {
+            position: absolute;
+            bottom: -38px;
+            left: 16px;
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            border: 3px solid var(--li-card);
+            background: #dfe3e8;
+            overflow: hidden
+        }
+
+        .liphoto img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .liphoto .init {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            color: #8a9199;
+            font-weight: 500
+        }
+
+        .libody {
+            padding: 48px 16px 16px
+        }
+
+        .liname {
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .libadge {
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0
+        }
+
+        .lihead {
             font-size: 14px;
+            line-height: 1.4;
+            margin: 5px 0 6px
+        }
+
+        .liloc {
+            font-size: 13px;
+            color: var(--li-mut)
+        }
+
+        .liconn {
+            font-size: 13px;
             color: var(--li-blue);
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-top: 5px
         }
-        
-        .li-buttons {
+
+        .libtns {
             display: flex;
             gap: 8px;
-            margin-bottom: 16px;
+            margin-top: 14px
         }
-        
-        .li-btn-primary {
+
+        .libtn {
             flex: 1;
-            background: var(--li-blue);
-            color: white;
-            border: none;
             border-radius: 20px;
-            padding: 8px 16px;
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        .li-btn-secondary {
-            flex: 1;
-            background: white;
-            color: var(--li-blue);
-            border: 1px solid var(--li-blue);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-weight: 600;
-            font-size: 15px;
-        }
-        
-        .li-section-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--li-text);
-        }
-        
-        .li-about-text {
+            padding: 7px 0;
             font-size: 14px;
-            line-height: 1.5;
-            color: var(--li-text);
-            white-space: pre-line;
+            font-weight: 600;
+            text-align: center;
+            border: 1px solid var(--li-blue)
         }
-        
-        .li-exp-item {
+
+        .libtn.p {
+            background: var(--li-blue);
+            color: #fff;
+            border-color: var(--li-blue)
+        }
+
+        .libtn.s {
+            background: #fff;
+            color: var(--li-blue)
+        }
+
+        .lisec {
+            padding: 16px
+        }
+
+        .lish {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 10px
+        }
+
+        .liabout {
+            font-size: 14px;
+            line-height: 1.52;
+            white-space: pre-line;
+            position: relative;
+            overflow: hidden
+        }
+
+        .liabout.clip {
+            max-height: 184px
+        }
+
+        .liabout.clip::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 46px;
+            background: linear-gradient(transparent, var(--li-card))
+        }
+
+        .limore {
+            display: inline-block;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--li-mut);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit
+        }
+
+        .liexp {
             display: flex;
             gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--li-border);
+            padding: 14px 0;
+            border-top: 1px solid var(--li-rule)
         }
-        
-        .li-exp-item:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
+
+        .liexp:first-of-type {
+            border-top: none;
+            padding-top: 2px
         }
-        
-        .li-exp-logo {
-            width: 48px;
-            height: 48px;
-            background: #f3f2ef;
+
+        .lilogo {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            background: #EDF0F2;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            color: var(--li-text-mut);
-            font-size: 20px;
+            color: #7d858d;
+            font-size: 17px;
+            border-radius: 2px;
+            overflow: hidden
         }
-        
-        .li-exp-logo img {
+
+        .lilogo img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: contain
         }
-        
-        .li-exp-content {
-            flex: 1;
-        }
-        
-        .li-exp-title {
+
+        .liti {
             font-size: 15px;
             font-weight: 600;
-            margin-bottom: 2px;
+            line-height: 1.3
         }
-        
-        .li-exp-company {
+
+        .lico {
             font-size: 14px;
-            color: var(--li-text);
-            margin-bottom: 2px;
+            margin-top: 1px
         }
-        
-        .li-exp-date {
+
+        .lidate {
             font-size: 13px;
-            color: var(--li-text-mut);
-            margin-bottom: 6px;
+            color: var(--li-mut);
+            margin-top: 1px
         }
-        
-        .li-exp-desc {
-            font-size: 14px;
-            color: var(--li-text);
+
+        .lidesc {
+            font-size: 13.5px;
             line-height: 1.5;
+            margin-top: 6px
         }
-        
-        /* SerpAPI Intelligence Section */
-        .li-card-intel {
-            background: linear-gradient(to bottom, #f0f7ff, #ffffff);
-            border: 1px solid #d0e4fb;
-            position: relative;
+
+        .sk {
+            background: linear-gradient(90deg, #e6e6e3 25%, #f0f0ed 50%, #e6e6e3 75%);
+            background-size: 200% 100%;
+            animation: sh 1.3s infinite;
+            border-radius: 3px
         }
-        
-        .intel-badge {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: var(--li-blue);
-            color: white;
+
+        @keyframes sh {
+            to {
+                background-position: -200% 0
+            }
+        }
+
+        /* open-web dossier */
+        .dossier {
+            background: var(--sheet);
+            border: 1px solid var(--rule);
+            padding: 26px 28px
+        }
+
+        .dossier h3 {
+            font-family: var(--serif);
+            font-size: 21px;
+            font-weight: 400;
+            margin-bottom: 4px
+        }
+
+        .dossier .meta {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            margin-bottom: 18px
+        }
+
+        .dossier .txt {
+            font-size: 14.5px;
+            line-height: 1.72;
+            color: var(--ink-mid)
+        }
+
+        .dossier .txt.wait {
+            color: var(--ink-soft);
+            font-style: italic
+        }
+
+        /* ─── ledger ─────────────────────────────────────────────── */
+        .tally {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            border: 1px solid var(--rule);
+            background: var(--sheet);
+            margin-bottom: 34px
+        }
+
+        .tally div {
+            flex: 1;
+            min-width: 132px;
+            padding: 18px 20px;
+            border-right: 1px solid var(--rule)
+        }
+
+        .tally div:last-child {
+            border-right: none
+        }
+
+        .tally .v {
+            font-family: var(--serif);
+            font-size: 38px;
+            line-height: 1;
+            font-weight: 400
+        }
+
+        .tally .k {
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            margin-top: 7px;
+            line-height: 1.35
+        }
+
+        .tally .cleared .v {
+            color: var(--intaglio)
+        }
+
+        .tally .attr .v {
+            color: var(--steel)
+        }
+
+        .tally .held .v {
+            color: var(--ledger)
+        }
+
+        .band {
+            font-family: var(--serif);
+            font-size: 20px;
+            font-weight: 400;
+            margin: 38px 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .band::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--rule)
+        }
+
+        .band:first-of-type {
+            margin-top: 0
+        }
+
+        .band-note {
+            font-size: 13px;
+            color: var(--ink-soft);
+            margin-bottom: 16px;
+            max-width: 60ch
+        }
+
+        .rows {
+            border-top: 1px solid var(--ink)
+        }
+
+        .row {
+            border-bottom: 1px solid var(--rule-soft);
+            background: transparent;
+            transition: background .25s
+        }
+
+        .row:hover {
+            background: var(--sheet)
+        }
+
+        .row-hit {
+            display: grid;
+            grid-template-columns: 34px minmax(0, 1fr) 118px;
+            gap: 16px;
+            align-items: start;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            font: inherit;
+            color: inherit;
+            padding: 17px 4px;
+            cursor: pointer
+        }
+
+        .row-n {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--ink-soft);
+            padding-top: 4px
+        }
+
+        .row-claim {
+            font-size: 15px;
+            line-height: 1.5
+        }
+
+        .row-type {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--ink-soft);
+            margin-top: 6px
+        }
+
+        /* the stamp — the one bold moment */
+        .stamp {
+            justify-self: end;
+            font-family: var(--sans);
             font-size: 10px;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 4px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: 6px 9px;
+            border: 1.5px solid currentColor;
+            border-radius: 2px;
+            line-height: 1.1;
+            text-align: center;
+            transform: rotate(-2.6deg);
+            position: relative;
+            white-space: nowrap;
+            box-shadow: 0 0 0 2.5px var(--bond), 0 0 0 3.5px currentColor;
         }
-        
-        .intel-content {
+
+        .stamp::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--stamp-ghost);
+            mix-blend-mode: multiply
+        }
+
+        .stamp.cleared {
+            color: var(--intaglio)
+        }
+
+        .stamp.attr {
+            color: var(--steel)
+        }
+
+        .stamp.held {
+            color: var(--ledger)
+        }
+
+        .stamp.press {
+            animation: press .5s var(--ease) both
+        }
+
+        @keyframes press {
+            0% {
+                opacity: 0;
+                transform: rotate(-2.6deg) scale(2.5)
+            }
+
+            62% {
+                opacity: 1;
+                transform: rotate(-2.6deg) scale(.93)
+            }
+
+            100% {
+                opacity: 1;
+                transform: rotate(-2.6deg) scale(1)
+            }
+        }
+
+        .stamp.pending {
+            color: var(--ink-soft);
+            border-style: dashed;
+            box-shadow: none;
+            transform: rotate(0);
+            font-weight: 500
+        }
+
+        .stamp.pending::after {
+            display: none
+        }
+
+        .stamp.pending.ready {
+            color: var(--steel);
+            border-style: solid
+        }
+
+        .pulse {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            margin-right: 5px;
+            vertical-align: 1px;
+            animation: pl 1.4s ease-in-out infinite
+        }
+
+        @keyframes pl {
+
+            0%,
+            100% {
+                opacity: .25
+            }
+
+            50% {
+                opacity: 1
+            }
+        }
+
+        .row-open {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows .4s var(--ease)
+        }
+
+        .row.open .row-open {
+            grid-template-rows: 1fr
+        }
+
+        .row-open>div {
+            overflow: hidden
+        }
+
+        .row-inner {
+            padding: 0 4px 22px 50px;
+            max-width: 78ch
+        }
+
+        .finding {
             font-size: 14px;
-            line-height: 1.6;
-            color: var(--li-text);
+            line-height: 1.66;
+            color: var(--ink-mid)
         }
-        
-        /* Remaining Styles */
-        #resultsArea{display:none}
-        #resultsArea.active{display:block}
-        .score-banner{display:flex;align-items:center;gap:20px;padding:20px 28px;background:var(--glass);border:1px solid var(--border-hi);border-radius:var(--r-lg);backdrop-filter:blur(16px);margin-bottom:24px;animation:fadeUp .4s var(--ease) both}
-        .score-ring-wrap{position:relative;width:64px;height:64px;flex-shrink:0}
-        .score-ring-wrap svg{transform:rotate(-90deg)}
-        .score-ring-bg{fill:none;stroke:rgba(99,102,241,.1);stroke-width:5}
-        .score-ring-fill{fill:none;stroke:url(#rg);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1.2s var(--ease)}
-        .score-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:17px;font-weight:800;color:var(--text)}
-        .score-info h3{font-size:17px;font-weight:700;color:var(--text);margin-bottom:2px}
-        .score-info p{font-size:13px;color:var(--text2)}
-        .sec-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:10px}
-        .badge{font-size:11px;font-weight:600;padding:2px 10px;border-radius:var(--r-pill);background:rgba(99,102,241,.12);color:var(--indigo)}
-        .claims-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
-        .claim-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r-md);padding:18px 22px;transition:all .25s var(--ease);animation:fadeUp .4s var(--ease) both}
-        .claim-card:hover{border-color:var(--border-hi);transform:translateY(-2px);box-shadow:var(--glow)}
-        .claim-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:8px}
-        .claim-text{font-size:13px;font-weight:500;color:var(--text);line-height:1.55;flex:1}
-        .verdict{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:var(--r-pill);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;flex-shrink:0}
-        .verdict.verified{background:rgba(52,211,153,.1);color:var(--emerald);border:1px solid rgba(52,211,153,.2)}
-        .verdict.partial{background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
-        .verdict.unverified,.verdict.partiallyverified{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
-        .verdict.contradicted{background:rgba(251,113,133,.1);color:var(--rose);border:1px solid rgba(251,113,133,.2)}
-        .verdict.pending{background:rgba(167,139,250,.1);color:var(--indigo);border:1px solid rgba(167,139,250,.2)}
-        .corr-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-pill);font-size:10px;font-weight:600;margin-top:4px}
-        .corr-badge.corr-2{background:rgba(52,211,153,.1);color:var(--emerald)}
-        .corr-badge.corr-1{background:rgba(251,191,36,.1);color:var(--amber)}
-        .corr-badge.corr-0{background:rgba(248,113,113,.1);color:var(--red)}
-        .gap-card{background:var(--glass);border:1px solid rgba(251,191,36,.15);border-radius:var(--r-md);padding:16px 20px;margin-bottom:10px}
-        .gap-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
-        .gap-reason{font-size:12px;color:var(--text2);line-height:1.5}
-        .gap-severity{display:inline-flex;padding:2px 8px;border-radius:var(--r-pill);font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:6px}
-        .gap-severity.critical{background:rgba(248,113,113,.15);color:var(--red)}
-        .gap-severity.high{background:rgba(251,191,36,.15);color:var(--amber)}
-        .gap-severity.medium{background:rgba(99,102,241,.12);color:var(--indigo)}
-        .claim-reason{font-size:12px;color:var(--text2);line-height:1.6}
-        .claim-source{margin-top:6px;font-size:11px}
-        .claim-source a{color:var(--cyan);text-decoration:none;font-family:'JetBrains Mono',monospace}
-        .quarantine{margin-top:8px;padding:20px 24px;background:rgba(248,113,113,.03);border:1px solid rgba(248,113,113,.12);border-radius:var(--r-lg)}
-        .quarantine-title{font-size:16px;font-weight:700;color:var(--red);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-        #approvalBar{display:none;margin-top:20px}
-        #approvalBar.active{display:block;animation:fadeUp .4s var(--ease) both}
-        .approval-card{padding:24px;background:var(--glass);border:1px solid var(--border-hi);border-radius:var(--r-lg);backdrop-filter:blur(16px)}
-        .approval-card h3{font-size:14px;font-weight:700;margin-bottom:10px}
-        .feedback-ta{width:100%;padding:11px 14px;background:rgba(7,11,20,.8);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;resize:vertical;min-height:60px;outline:none;margin-bottom:14px;transition:border-color .2s}
-        .feedback-ta:focus{border-color:var(--indigo)}
-        .approval-actions{display:flex;gap:10px;flex-wrap:wrap}
-        #reportSection{display:none;margin-top:24px}
-        #reportSection.active{display:block;animation:fadeUp .5s var(--ease) both}
-        .report-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--r-lg);padding:36px 40px;line-height:1.8;font-size:13.5px;box-shadow:var(--shadow)}
-        .report-card h1,.report-card h2,.report-card h3{color:var(--text);margin:20px 0 10px}
-        .report-card h1{font-size:20px}.report-card h2{font-size:16px;color:var(--indigo)}.report-card h3{font-size:14px}
-        .report-card p{color:var(--text2);margin-bottom:10px}
-        .report-card ul,.report-card ol{padding-left:20px;color:var(--text2);margin-bottom:10px}
-        .report-card li{margin-bottom:5px}.report-card strong{color:var(--text)}
-        .report-card a{color:var(--cyan);text-decoration:none}.report-card a:hover{text-decoration:underline}
-        .report-card code{background:rgba(99,102,241,.1);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px}
-        .report-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
-        .toast{position:fixed;bottom:28px;right:28px;padding:13px 22px;background:var(--glass);border:1px solid var(--border-hi);border-radius:var(--r-md);color:var(--text);font-size:13px;font-weight:500;z-index:9999;backdrop-filter:blur(16px);box-shadow:var(--shadow);transform:translateY(80px);opacity:0;transition:all .3s var(--ease)}
-        .toast.show{transform:translateY(0);opacity:1}
-        .toast.err{border-color:var(--rose)}
-        @media(max-width:640px){.shell{padding:20px 16px 60px}.header h1{font-size:28px}.input-row{flex-direction:column}.btn{width:100%}.report-card{padding:24px 20px}}
+
+        .evidence {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.65;
+            color: var(--ink);
+            background: var(--sheet);
+            border-left: 2px solid var(--intaglio);
+            padding: 12px 16px;
+            margin: 14px 0
+        }
+
+        .evidence.held {
+            border-left-color: var(--ledger)
+        }
+
+        .prov {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            font-size: 12px;
+            color: var(--ink-soft);
+            align-items: center
+        }
+
+        .prov a {
+            color: var(--steel);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(59, 95, 121, .35)
+        }
+
+        .prov a:hover {
+            border-bottom-color: var(--steel)
+        }
+
+        .tier {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            border: 1px solid var(--rule);
+            padding: 2px 6px;
+            color: var(--ink-mid)
+        }
+
+        /* held back band gets weight */
+        #act-held {
+            background: linear-gradient(var(--sheet), var(--sheet)) padding-box
+        }
+
+        #act-held .act-head h2 {
+            color: var(--ledger)
+        }
+
+        #act-held .rows {
+            border-top-color: var(--ledger)
+        }
+
+        /* gaps */
+        .gap {
+            display: grid;
+            grid-template-columns: 26px minmax(0, 1fr);
+            gap: 18px;
+            padding: 22px 0;
+            border-bottom: 1px solid var(--rule-soft)
+        }
+
+        .gap:last-child {
+            border-bottom: none
+        }
+
+        .gap-n {
+            font-family: var(--serif);
+            font-size: 27px;
+            line-height: .9;
+            color: var(--rule)
+        }
+
+        .gap h4 {
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.35;
+            margin-bottom: 7px
+        }
+
+        .gap p {
+            font-size: 14.5px;
+            color: var(--ink-mid);
+            max-width: 70ch
+        }
+
+        .sev {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            padding: 1px 7px;
+            border: 1px solid currentColor;
+            margin-bottom: 9px
+        }
+
+        .sev.critical {
+            color: var(--ledger)
+        }
+
+        .sev.high {
+            color: #9A6410
+        }
+
+        .sev.medium {
+            color: var(--steel)
+        }
+
+        /* sign-off */
+        .signoff {
+            background: var(--sheet);
+            border: 1px solid var(--ink);
+            padding: 32px 34px;
+            max-width: 760px
+        }
+
+        .signoff h3 {
+            font-family: var(--serif);
+            font-size: 23px;
+            font-weight: 400;
+            margin-bottom: 8px
+        }
+
+        .signoff p {
+            font-size: 14.5px;
+            color: var(--ink-mid);
+            max-width: 62ch;
+            margin-bottom: 20px
+        }
+
+        .signoff textarea {
+            width: 100%;
+            min-height: 96px;
+            padding: 13px 15px;
+            background: #fff;
+            border: 1px solid var(--rule);
+            border-bottom: 2px solid var(--ink);
+            font-family: var(--sans);
+            font-size: 14px;
+            color: var(--ink);
+            resize: vertical;
+            outline: none;
+            margin-bottom: 6px;
+        }
+
+        .signoff textarea:focus {
+            border-bottom-color: var(--intaglio)
+        }
+
+        .sig-line {
+            font-size: 11.5px;
+            color: var(--ink-soft);
+            font-family: var(--mono);
+            margin-bottom: 20px
+        }
+
+        .acts {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .b2 {
+            padding: 13px 24px;
+            background: transparent;
+            border: 1px solid var(--rule);
+            color: var(--ink-mid);
+            font-family: var(--sans);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color .2s, color .2s
+        }
+
+        .b2:hover {
+            border-color: var(--ink);
+            color: var(--ink)
+        }
+
+        .b2:disabled {
+            opacity: .45;
+            cursor: not-allowed
+        }
+
+        .b2.danger:hover {
+            border-color: var(--ledger);
+            color: var(--ledger)
+        }
+
+        /* brief */
+        .brief {
+            background: #FCFCF8;
+            border: 1px solid var(--rule);
+            padding: clamp(28px, 4.4vw, 60px);
+            box-shadow: 0 20px 40px -32px rgba(22, 33, 28, .5);
+            max-width: 840px
+        }
+
+        .brief h1 {
+            font-family: var(--serif);
+            font-size: 31px;
+            font-weight: 400;
+            line-height: 1.15;
+            margin: 0 0 18px
+        }
+
+        .brief h2 {
+            font-family: var(--serif);
+            font-size: 22px;
+            font-weight: 400;
+            margin: 34px 0 12px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid var(--rule)
+        }
+
+        .brief h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 24px 0 8px
+        }
+
+        .brief p {
+            margin-bottom: 14px;
+            color: var(--ink-mid);
+            font-size: 15px;
+            line-height: 1.75;
+            max-width: 72ch
+        }
+
+        .brief ul,
+        .brief ol {
+            margin: 0 0 16px 20px;
+            color: var(--ink-mid);
+            font-size: 15px
+        }
+
+        .brief li {
+            margin-bottom: 6px;
+            line-height: 1.65
+        }
+
+        .brief strong {
+            color: var(--ink);
+            font-weight: 600
+        }
+
+        .brief a {
+            color: var(--steel)
+        }
+
+        .brief code {
+            font-family: var(--mono);
+            font-size: 12.5px;
+            background: var(--bond-deep);
+            padding: 1px 5px
+        }
+
+        .brief table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 20px;
+            font-size: 13.5px
+        }
+
+        .brief th {
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1.5px solid var(--ink);
+            padding: 9px 10px 9px 0;
+            vertical-align: top
+        }
+
+        .brief td {
+            border-bottom: 1px solid var(--rule-soft);
+            padding: 10px 10px 10px 0;
+            color: var(--ink-mid);
+            vertical-align: top;
+            line-height: 1.55
+        }
+
+        .brief hr {
+            border: none;
+            border-top: 1px solid var(--rule);
+            margin: 28px 0
+        }
+
+        /* toast */
+        .toast {
+            position: fixed;
+            bottom: 26px;
+            left: 50%;
+            transform: translate(-50%, 72px);
+            background: var(--ink);
+            color: var(--bond);
+            padding: 13px 22px;
+            font-size: 13.5px;
+            font-weight: 500;
+            z-index: 200;
+            opacity: 0;
+            transition: transform .35s var(--ease), opacity .35s;
+            max-width: calc(100vw - 40px)
+        }
+
+        .toast.on {
+            transform: translate(-50%, 0);
+            opacity: 1
+        }
+
+        .toast.bad {
+            background: var(--ledger)
+        }
+
+        /* empty / error states */
+        .note {
+            border: 1px solid var(--rule);
+            border-left: 3px solid var(--ledger);
+            background: var(--sheet);
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--ink-mid);
+            max-width: 70ch
+        }
+
+        .note b {
+            color: var(--ink);
+            font-weight: 600
+        }
+
+        @media(max-width:1000px) {
+            .frame {
+                grid-template-columns: 1fr
+            }
+
+            .spine {
+                position: sticky;
+                top: 0;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--rule);
+                background: var(--bond);
+                padding: 12px 20px;
+                z-index: 80;
+                flex-direction: row;
+                align-items: center;
+                gap: 16px
+            }
+
+            .spine-mark span,
+            .spine-hr,
+            .spine-h,
+            .spine-foot {
+                display: none
+            }
+
+            .spine-mark {
+                font-size: 15px;
+                white-space: nowrap
+            }
+
+            #trail {
+                max-height: 34px;
+                mask-image: none
+            }
+
+            .tr {
+                grid-template-columns: 48px 1fr
+            }
+
+            .rosette {
+                right: -220px;
+                opacity: .16
+            }
+
+            .subject {
+                grid-template-columns: 1fr
+            }
+
+            .phone-col {
+                position: static;
+                justify-self: center
+            }
+        }
+
+        @media(max-width:560px) {
+            .intake {
+                flex-direction: column
+            }
+
+            .go {
+                width: 100%
+            }
+
+            .phone {
+                width: min(100%, 338px);
+                height: auto;
+                aspect-ratio: 338/706
+            }
+
+            .row-hit {
+                grid-template-columns: 24px minmax(0, 1fr);
+                gap: 10px
+            }
+
+            .stamp {
+                grid-column: 2;
+                justify-self: start;
+                margin-top: 10px
+            }
+
+            .row-inner {
+                padding-left: 34px
+            }
+        }
+
+        @media(prefers-reduced-motion:reduce) {
+            html {
+                scroll-behavior: auto
+            }
+
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important
+            }
+        }
     </style>
 </head>
+
 <body>
-<div class="ambient"></div>
-<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#818cf8"/><stop offset="50%" stop-color="#a78bfa"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs></svg>
 
-<div class="shell">
-    <header class="header">
-        <div class="pill"><span class="pill-dot"></span>Growpido Track B</div>
-        <h1>Executive Reputation Diagnostic</h1>
-        <p>Drop a LinkedIn URL. We extract every claim, verify each one against primary sources, and generate a strict due-diligence brief.</p>
-    </header>
+    <div id="progress"></div>
 
-    <div class="input-card" id="inputCard">
-        <label class="input-label" for="linkedinUrl">LinkedIn Profile URL</label>
-        <div class="input-row">
-            <input type="url" id="linkedinUrl" class="url-input" placeholder="https://www.linkedin.com/in/executive-name" autocomplete="off">
-            <button class="btn" id="startBtn" onclick="startPipeline()">Run Diagnostic</button>
-        </div>
-    </div>
+    <div class="frame">
 
-    <div id="scanScreen">
-        <div class="scan-header">
-            <div class="scan-spinner" id="scanSpinner"></div>
-            <div class="scan-info">
-                <h3 id="scanTitle">Initialising pipeline...</h3>
-                <p id="scanSubtitle">Connecting to LinkedIn via Apify proxy</p>
-            </div>
-        </div>
-        <div class="scan-stages">
-            <div class="stage-row" id="s-ingest"><span class="stage-icon">&#128269;</span><span class="stage-name">Profile Ingestion (Apify)</span><span class="stage-status">queued</span></div>
-            <div class="stage-row" id="s-enrich"><span class="stage-icon">&#127760;</span><span class="stage-name">Google AI Enrichment (SerpAPI)</span><span class="stage-status">queued</span></div>
-            <div class="stage-row" id="s-extract"><span class="stage-icon">&#129504;</span><span class="stage-name">Claim Extraction (NVIDIA NIM)</span><span class="stage-status">queued</span></div>
-            <div class="stage-row" id="s-verify"><span class="stage-icon">&#9878;&#65039;</span><span class="stage-name">Batch Verification (Perplexity)</span><span class="stage-status">queued</span></div>
-            <div class="stage-row" id="s-pause"><span class="stage-icon">&#128100;</span><span class="stage-name">Human Review Gate</span><span class="stage-status">queued</span></div>
-        </div>
-        
-        <div id="profileCard">
-            <div class="phone-frame">
-                <div class="phone-notch"></div>
-                <div class="phone-content" id="phoneContent">
-                    <!-- Phone content injected by JS -->
-                </div>
-            </div>
-            
-            <div class="side-panel" id="sidePanel">
-                <!-- Side panel content injected by JS -->
-            </div>
-        </div>
-    </div>
+        <aside class="spine">
+            <div class="spine-mark">Growpido<span>Reputation diagnostics</span></div>
+            <div class="spine-hr"></div>
+            <div class="spine-h">Audit trail</div>
+            <div id="trail"></div>
+            <div class="spine-foot"><span>Sources read</span><b id="srcCount">0</b></div>
+        </aside>
 
-    <div id="resultsArea">
-        <div class="score-banner">
-            <div class="score-ring-wrap">
-                <svg width="64" height="64" viewBox="0 0 64 64">
-                    <circle class="score-ring-bg" cx="32" cy="32" r="27"/>
-                    <circle class="score-ring-fill" id="ringFill" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6"/>
-                </svg>
-                <span class="score-val" id="scoreVal">0%</span>
-            </div>
-            <div class="score-info">
-                <h3 id="scoreExec">Executive</h3>
-                <p id="scoreSub">Loading results...</p>
-            </div>
-        </div>
-        <div class="sec-title">Verified Footprint <span class="badge" id="verifiedBadge">0</span></div>
-        <div class="claims-list" id="verifiedList"></div>
-        <div class="quarantine" id="quarantineZone" style="display:none">
-            <div class="quarantine-title">&#9888;&#65039; The Quarantine Zone</div>
-            <div class="claims-list" id="refusalList"></div>
-        </div>
-        <div id="gapsZone" style="display:none;margin-top:16px">
-            <div class="sec-title">📊 Narrative Gaps <span class="badge">Strategic</span></div>
-            <div id="gapsList"></div>
-        </div>
-        <div id="approvalBar">
-            <div class="approval-card">
-                <h3>Human Review Gate &mdash; Your Approval Required</h3>
-                <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Review the ledger and gaps above. Save notes separately, then explicitly approve to generate the final report.</p>
-                <textarea class="feedback-ta" id="feedbackInput" placeholder="Optional: Add reviewer notes, corrections, or context..."></textarea>
-                <div class="approval-actions">
-                    <button class="btn-outline" id="saveFeedbackBtn" onclick="saveFeedback()">💾 Save Feedback</button>
-                    <button class="btn-outline" id="approveBtn" onclick="approvePipeline()" style="background:rgba(52,211,153,.15);border-color:var(--emerald);color:var(--emerald)">&#10003; Approve &amp; Generate Report</button>
-                    <button class="btn-danger" onclick="resetAll()">&#10005; Discard &amp; Restart</button>
-                </div>
-            </div>
-        </div>
-    </div>
+        <div class="col">
 
-    <div id="reportSection">
-        <div class="sec-title">Final Diagnostic Brief</div>
-        <div class="report-card" id="reportBody"></div>
-        <div class="report-actions">
-            <button class="btn-copy" onclick="copyReport()">&#128203; Copy Markdown</button>
-            <button class="btn-danger" onclick="resetAll()">Run Another</button>
-        </div>
-    </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-let _threadId=null,_reportMarkdown='',_pollInterval=null;
-function $(id){return document.getElementById(id)}
-function show(id){$(id).classList.add('active')}
-function hide(id){$(id).classList.remove('active')}
-function showEl(id){$(id).style.display='block'}
-function hideEl(id){$(id).style.display='none'}
-function toast(msg,isErr=false){const t=$('toast');t.textContent=msg;t.className='toast show'+(isErr?' err':'');setTimeout(()=>t.className='toast',3500)}
-function setStage(id,state){const el=$(id);el.className='stage-row'+(state?' '+state:'');const s=el.querySelector('.stage-status');s.textContent=state==='active'?'running...':state==='done'?'done ✓':'queued'}
-function animateRing(pct){const c=169.6;$('ringFill').style.strokeDashoffset=c-(c*pct/100);$('scoreVal').textContent=Math.round(pct)+'%'}
-
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
-function renderProfileCard(data){
-    const raw = data.raw_profile || {};
-    const googleCtx = data.google_person_context || '';
-    
-    // Fallbacks
-    const firstName = esc(raw.firstName || data.executive_name || 'Unknown');
-    const lastName = esc(raw.lastName || '');
-    const fullName = (firstName + ' ' + lastName).trim();
-    const headline = esc(raw.headline || data.headline || '');
-    
-    let locStr = 'Unknown Location';
-    if (typeof raw.location === 'string') {
-        locStr = raw.location;
-    } else if (raw.location && typeof raw.location === 'object') {
-        locStr = raw.location.defaultLocalizedName || raw.location.city || raw.location.country || 'Unknown Location';
-    }
-    const location = esc(locStr);
-    const connections = raw.connectionsCount || 0;
-    const followers = raw.followerCount || 0;
-    const about = esc(raw.about || raw.summary || '');
-    const photoUrl = raw.profilePicture && raw.profilePicture.url ? raw.profilePicture.url : '';
-    const coverUrl = raw.coverPicture && raw.coverPicture.url ? raw.coverPicture.url : '';
-    
-    let photoHtml = '';
-    if(photoUrl) {
-        photoHtml = '<img src="' + photoUrl + '" class="li-photo" alt="Profile Photo">';
-    } else {
-        photoHtml = '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;color:#999;">' + firstName.charAt(0) + '</div>';
-    }
-
-    let html = `
-        <div class="li-card" style="padding:0; margin-bottom:8px;">
-            <div class="li-banner" ${coverUrl ? `style="background-image: url('${coverUrl}'); background-size: cover; background-position: center;"` : ''}>
-                <div class="li-photo-wrapper">
-                    ${photoHtml}
-                </div>
-            </div>
-            <div style="padding: 16px;">
-                <div class="li-profile-top">
-                    <div class="li-name">${fullName} <span class="li-verified">✓</span></div>
-                    <div class="li-headline">${headline}</div>
-                    <div class="li-location">${location}</div>
-                    <div class="li-connections">${followers.toLocaleString()} followers &middot; ${connections.toLocaleString()}+ connections</div>
-                    
-                    <div class="li-buttons">
-                        <button class="li-btn-primary">Connect</button>
-                        <button class="li-btn-secondary">Message</button>
+            <!-- ACT 0 — INTAKE -->
+            <section class="act" id="act-intake">
+                <div class="hero">
+                    <svg class="rosette" viewBox="-160 -160 320 320" aria-hidden="true">
+                        <g class="g1">
+                            <path id="r1" />
+                        </g>
+                        <g class="g2">
+                            <path id="r2" />
+                        </g>
+                    </svg>
+                    <div class="hero-in">
+                        <h1 class="lede">Every claim on a profile,<br>checked against a source <em>we can name.</em>
+                        </h1>
+                        <p class="lede d1">Give it a LinkedIn URL. It takes the profile apart into single verifiable
+                            facts, hunts each one down across independent sources, and hands back three piles: what you
+                            can publish, what needs a citation attached, and what it refuses to let through.</p>
+                        <div class="intake lede d2">
+                            <div class="field">
+                                <input type="url" id="url" placeholder="https://www.linkedin.com/in/executive-name"
+                                    autocomplete="off" spellcheck="false">
+                            </div>
+                            <button class="go" id="goBtn">Run the audit</button>
+                        </div>
+                        <p class="rules lede d3">House rules travel with the output: <b>no number without a source</b>,
+                            no superlative that traces back to the subject's own press release, and nothing reaches a
+                            client until a human signs it off.</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    `;
+            </section>
 
-    // Web Intelligence Section (SerpAPI) moved to side panel
-    let sideHtml = '';
-    if(googleCtx) {
-        sideHtml = `
-            <div class="li-card li-card-intel" style="border-radius: var(--r-xl); height: 100%; border: 1px solid var(--border); overflow-y: auto;">
-                <div class="intel-badge" style="margin-bottom: 12px; display: inline-block;">Web Intelligence</div>
-                <div class="li-section-title" style="display:flex;align-items:center;gap:8px; margin-bottom: 16px;">
-                    🌐 Open Web Context
+            <!-- ACT 1 — SUBJECT -->
+            <section class="act" id="act-subject" hidden>
+                <div class="act-head"><span class="n">01</span>
+                    <h2>The subject</h2>
                 </div>
-                <div class="intel-content" style="font-size: 15px;">${googleCtx}</div>
-            </div>
-        `;
-    }
-    $('sidePanel').innerHTML = sideHtml;
+                <p class="act-sub">What the profile says about itself, beside what the open web says about it. Nothing
+                    here is verified yet.</p>
+                <div class="subject">
+                    <div class="phone-col">
+                        <div class="phone">
+                            <div class="screen" id="screen"></div>
+                        </div>
+                        <div class="phone-cap" id="phoneCap">Scraped profile, as published</div>
+                    </div>
+                    <div class="dossier">
+                        <h3 id="dosName">Open web context</h3>
+                        <div class="meta" id="dosMeta">Waiting on enrichment</div>
+                        <div class="txt wait" id="dosTxt">Searching the open web for independent context.</div>
+                    </div>
+                </div>
+            </section>
 
-    // About Section
-    if(about) {
-        html += `
-            <div class="li-card">
-                <div class="li-section-title">About</div>
-                <div class="li-about-text">${about}</div>
-            </div>
-        `;
-    }
+            <!-- ACT 2 — LEDGER -->
+            <section class="act" id="act-ledger" hidden>
+                <div class="act-head"><span class="n">02</span>
+                    <h2>The ledger</h2>
+                </div>
+                <p class="act-sub" id="ledgerSub">The profile broken into single checkable facts. Each one gets its own
+                    verdict and its own source.</p>
+                <div class="tally">
+                    <div class="cleared">
+                        <div class="v" id="tCleared">0</div>
+                        <div class="k">Verified</div>
+                    </div>
+                    <div class="attr">
+                        <div class="v" id="tAttr">0</div>
+                        <div class="k">Partially verified</div>
+                    </div>
+                    <div class="held">
+                        <div class="v" id="tHeld">0</div>
+                        <div class="k">Contradicted</div>
+                    </div>
+                    <div>
+                        <div class="v" id="tTotal">0</div>
+                        <div class="k">Claims examined</div>
+                    </div>
+                </div>
+                <div id="workBanner" class="work-banner" hidden>
+                    <div class="work-spin" aria-hidden="true"></div>
+                    <div class="work-body">
+                        <div class="work-title" id="workTitle">Working</div>
+                        <div class="work-sub" id="workSub">This can take a couple of minutes. Please keep this tab open.</div>
+                        <div class="work-track"><div class="work-fill" id="workFill"></div></div>
+                    </div>
+                    <div class="work-meta"><span id="workCount">0 / 0</span><span id="workClock">0:00</span></div>
+                </div>
+                <div id="bands"></div>
+            </section>
 
-    // Experience Section
-    const exp = raw.experience || [];
-    if(exp.length > 0) {
-        html += `<div class="li-card"><div class="li-section-title">Experience</div>`;
-        exp.forEach(job => {
-            const title = esc(job.position || job.title || 'Role');
-            const company = esc(job.companyName || 'Company');
-            
-            let startText = job.startDate && job.startDate.text ? job.startDate.text : (job.startDate && job.startDate.year ? job.startDate.year : '');
-            let endText = job.endDate && job.endDate.text ? job.endDate.text : (job.endDate && job.endDate.year ? job.endDate.year : 'Present');
-            let durText = job.duration ? ` · ${job.duration}` : '';
-            let dateStr = startText ? `${startText} - ${endText}${durText}` : (job.duration || job.dateRange || '');
-            const date = esc(dateStr);
-            
-            const desc = esc(job.description || '');
-            const initial = company.charAt(0).toUpperCase() || 'C';
-            
-            // Try companyLogo if available
-            let logoUrl = job.companyLogoUrl || (job.companyLogo && job.companyLogo.url) || '';
-            let logoHtml = `<div class="li-exp-logo">${initial}</div>`;
-            if(logoUrl) {
-                logoHtml = `<div class="li-exp-logo"><img src="${logoUrl}" alt="Logo"></div>`;
+            <!-- ACT 3 — HELD BACK -->
+            <section class="act" id="act-held" hidden>
+                <div class="act-head"><span class="n">03</span>
+                    <h2>Contradicted</h2>
+                </div>
+                <p class="act-sub">The part that matters most. For these claims a credible source says otherwise — the
+                    fact is wrong. The system will not let them into client content. Each one names the source that
+                    contradicted it and the correct value.</p>
+                <div class="rows" id="heldRows"></div>
+            </section>
+
+            <!-- ACT 4 — GAPS -->
+            <section class="act" id="act-gaps" hidden>
+                <div class="act-head"><span class="n">04</span>
+                    <h2>Where the profile is thin</h2>
+                </div>
+                <p class="act-sub">Not errors. Structural weaknesses in how this person currently shows up, ranked by
+                    what they would cost in a room full of DIFC counterparties.</p>
+                <div id="gapList"></div>
+            </section>
+
+            <!-- ACT 5 — SIGN-OFF -->
+            <section class="act" id="act-gate" hidden>
+                <div class="act-head"><span class="n">05</span>
+                    <h2>Sign-off</h2>
+                </div>
+                <p class="act-sub">The engine stops here and cannot continue on its own. No brief is written until a
+                    person approves the ledger above.</p>
+                <div class="signoff">
+                    <h3>Reviewer approval</h3>
+                    <p>Read the ledger and the held-back list. Add corrections or context if you have them, then
+                        approve. Your notes are carried into the brief and recorded against this run.</p>
+                    <textarea id="notes"
+                        placeholder="Corrections, context, or a verdict you want overridden."></textarea>
+                    <div class="sig-line" id="sigLine">Unsigned</div>
+                    <div class="acts">
+                        <button class="b2" id="saveBtn">Save notes</button>
+                        <button class="go" id="approveBtn">Approve and write the brief</button>
+                        <button class="b2 danger" id="resetBtn">Discard this run</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ACT 6 — BRIEF -->
+            <section class="act" id="act-brief" hidden>
+                <div class="act-head"><span class="n">06</span>
+                    <h2>The brief</h2>
+                </div>
+                <p class="act-sub">One page, sourced throughout, ready to go to the client.</p>
+                <div class="brief" id="briefBody"></div>
+                <div class="acts" style="margin-top:22px">
+                    <button class="b2" id="copyBtn">Copy as Markdown</button>
+                    <button class="b2 danger" id="resetBtn2">Run another profile</button>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        'use strict';
+        const $ = id => document.getElementById(id);
+        const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+        let threadId = null, pollTimer = null, reportMd = '', sourceUrls = new Set();
+        let lastUserScroll = 0, shownRefs = new Set(), profileDrawn = false, claimsDrawn = false;
+        const DEMO = new URLSearchParams(location.search).has('demo');
+
+        addEventListener('wheel', () => lastUserScroll = Date.now(), { passive: true });
+        addEventListener('touchmove', () => lastUserScroll = Date.now(), { passive: true });
+
+        /* ── engraved rosette ───────────────────────────────────── */
+        (function rosette() {
+            const build = (R, r, d, turns) => {
+                let p = '';
+                for (let t = 0; t <= Math.PI * 2 * turns; t += .02) {
+                    const k = (R - r) / r;
+                    const x = (R - r) * Math.cos(t) + d * Math.cos(k * t);
+                    const y = (R - r) * Math.sin(t) - d * Math.sin(k * t);
+                    p += (p ? 'L' : 'M') + x.toFixed(2) + ' ' + y.toFixed(2);
+                }
+                return p;
+            };
+            $('r1').setAttribute('d', build(150, 47, 92, 47));
+            $('r2').setAttribute('d', build(118, 31, 74, 31));
+        })();
+
+        /* ── audit trail ────────────────────────────────────────── */
+        function log(msg, kind) {
+            const t = new Date().toTimeString().slice(0, 8);
+            const el = document.createElement('div');
+            el.className = 'tr' + (kind ? ' ' + kind : '');
+            el.innerHTML = '<b>' + t + '</b><i>' + esc(msg) + '</i>';
+            $('trail').appendChild(el);
+            $('trail').scrollTop = $('trail').scrollHeight;
+            while ($('trail').children.length > 120) $('trail').firstChild.remove();
+        }
+        function progress(pct) { $('progress').style.width = pct + '%'; }
+        function toast(msg, bad) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = 'toast on' + (bad ? ' bad' : '');
+            clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 4000);
+        }
+        function reveal(id) {
+            const el = $(id);
+            if (!el.hidden) return el;
+            el.hidden = false;
+            if (Date.now() - lastUserScroll > 2500) {
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 90);
             }
-            
-            html += `
-                <div class="li-exp-item">
-                    ${logoHtml}
-                    <div class="li-exp-content">
-                        <div class="li-exp-title">${title}</div>
-                        <div class="li-exp-company">${company}</div>
-                        <div class="li-exp-date">${date}</div>
-                        ${desc ? `<div class="li-exp-desc">${desc}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-        html += `</div>`;
-    }
+            return el;
+        }
 
-    // Education Section
-    const edu = raw.education || [];
-    if(edu.length > 0) {
-        html += `<div class="li-card"><div class="li-section-title">Education</div>`;
-        edu.forEach(school => {
-            const name = esc(school.schoolName || 'School');
-            const degree = esc(school.degree || '');
-            const field = esc(school.fieldOfStudy || school.field || '');
-            
-            let startText = school.startDate && school.startDate.text ? school.startDate.text : (school.startDate && school.startDate.year ? school.startDate.year : '');
-            let endText = school.endDate && school.endDate.text ? school.endDate.text : (school.endDate && school.endDate.year ? school.endDate.year : 'Present');
-            let dateStr = startText ? `${startText} - ${endText}` : (school.duration || school.dateRange || '');
-            const date = esc(dateStr);
-            
-            const initial = name.charAt(0).toUpperCase() || 'S';
-            
-            let logoUrl = school.schoolLogoUrl || (school.schoolLogo && school.schoolLogo.url) || '';
-            let logoHtml = `<div class="li-exp-logo">${initial}</div>`;
-            if(logoUrl) {
-                logoHtml = `<div class="li-exp-logo"><img src="${logoUrl}" alt="Logo"></div>`;
+        /* ── LinkedIn phone ─────────────────────────────────────── */
+        function skeleton() {
+            $('screen').innerHTML =
+                '<div class="licard"><div class="libanner"></div><div class="libody">' +
+                '<div class="sk" style="height:24px;width:62%"></div>' +
+                '<div class="sk" style="height:14px;width:88%;margin-top:12px"></div>' +
+                '<div class="sk" style="height:14px;width:54%;margin-top:8px"></div>' +
+                '<div class="sk" style="height:34px;width:100%;margin-top:20px;border-radius:18px"></div>' +
+                '</div></div>' +
+                '<div class="licard lisec"><div class="sk" style="height:14px;width:100%"></div>' +
+                '<div class="sk" style="height:14px;width:96%;margin-top:9px"></div>' +
+                '<div class="sk" style="height:14px;width:72%;margin-top:9px"></div></div>';
+        }
+
+        const battery = '<svg width="24" height="12" viewBox="0 0 24 12"><rect x="0" y="0" width="20" height="12" rx="3" fill="none" stroke="#1B1B1B" stroke-opacity=".38"/><rect x="2" y="2" width="14" height="8" rx="1.5" fill="#1B1B1B"/><path d="M21.5 4v4a2.4 2.4 0 0 0 0-4z" fill="#1B1B1B" fill-opacity=".38"/></svg>';
+        const wifi = '<svg width="15" height="11" viewBox="0 0 15 11"><path d="M7.5 9.6 9.6 7.4a3 3 0 0 0-4.2 0zM7.5 3.4a6 6 0 0 1 4.2 1.8l1.4-1.5a8 8 0 0 0-11.2 0l1.4 1.5A6 6 0 0 1 7.5 3.4z" fill="#1B1B1B"/></svg>';
+        const cell = '<svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="1" fill="#1B1B1B"/><rect x="4.6" y="5" width="3" height="6" rx="1" fill="#1B1B1B"/><rect x="9.2" y="2.5" width="3" height="8.5" rx="1" fill="#1B1B1B"/><rect x="13.8" y="0" width="3" height="11" rx="1" fill="#1B1B1B" fill-opacity=".3"/></svg>';
+        const verifiedIcon = '<svg class="libadge" viewBox="0 0 16 16"><path d="M8 0 9.9 1.5 12.3 1.2 13.2 3.5 15.3 4.7 14.7 7.1 15.3 9.5 13.2 10.7 12.3 13 9.9 12.7 8 14.2 6.1 12.7 3.7 13 2.8 10.7 .7 9.5 1.3 7.1 .7 4.7 2.8 3.5 3.7 1.2 6.1 1.5z" fill="#0A66C2"/><path d="M6.9 10.1 4.4 7.6l1-1 1.5 1.5 3.7-3.7 1 1z" fill="#fff"/></svg>';
+
+        function drawPhone(d) {
+            const raw = d.raw_profile || {};
+            const first = raw.firstName || (d.executive_name || 'Unknown').split(' ')[0];
+            const full = esc(((raw.firstName || '') + ' ' + (raw.lastName || '')).trim() || d.executive_name || 'Unknown');
+            const headline = esc(raw.headline || d.headline || '');
+            let loc = raw.location;
+            loc = typeof loc === 'string' ? loc : (loc && (loc.defaultLocalizedName || loc.city || loc.country)) || '';
+            const followers = Number(raw.followerCount || 0), conns = Number(raw.connectionsCount || 0);
+            const about = esc(raw.about || raw.summary || '');
+            const pic = raw.profilePicture && raw.profilePicture.url;
+            const cov = raw.coverPicture && raw.coverPicture.url;
+
+            let h = '<div class="sbar"><span>9:41</span><span class="r">' + cell + wifi + battery + '</span></div>';
+            h += '<div class="linav"><div class="liav">' + (pic ? '<img src="' + esc(pic) + '" alt="">' : '') + '</div><div class="lisearch">Search</div></div>';
+
+            h += '<div class="licard"><div class="libanner"' + (cov ? ' style="background-image:url(\'' + esc(cov) + '\')"' : '') + '>' +
+                '<div class="liphoto">' + (pic ? '<img src="' + esc(pic) + '" alt="">' : '<div class="init">' + esc(first.charAt(0)) + '</div>') + '</div></div>' +
+                '<div class="libody"><div class="liname">' + full + verifiedIcon + '</div>' +
+                (headline ? '<div class="lihead">' + headline + '</div>' : '') +
+                (loc ? '<div class="liloc">' + esc(loc) + '</div>' : '') +
+                (followers || conns ? '<div class="liconn">' + followers.toLocaleString() + ' followers · ' + conns.toLocaleString() + '+ connections</div>' : '') +
+                '<div class="libtns"><div class="libtn p">Connect</div><div class="libtn s">Message</div></div></div></div>';
+
+            if (about) {
+                h += '<div class="licard lisec"><div class="lish">About</div>' +
+                    '<div class="liabout clip" id="aboutBox">' + about + '</div>' +
+                    '<button class="limore" id="moreBtn">…see more</button></div>';
             }
 
-            let degStr = [degree, field].filter(Boolean).join(', ');
+            const exp = raw.experience || [];
+            if (exp.length) {
+                h += '<div class="licard lisec"><div class="lish">Experience</div>';
+                exp.forEach(j => {
+                    const co = esc(j.companyName || 'Company');
+                    const s = (j.startDate && (j.startDate.text || j.startDate.year)) || '';
+                    const e = (j.endDate && (j.endDate.text || j.endDate.year)) || 'Present';
+                    const dur = j.duration ? ' · ' + j.duration : '';
+                    const date = s ? s + ' – ' + e + dur : (j.duration || j.dateRange || '');
+                    const logo = j.companyLogoUrl || (j.companyLogo && j.companyLogo.url) || '';
+                    h += '<div class="liexp"><div class="lilogo">' + (logo ? '<img src="' + esc(logo) + '" alt="">' : esc(co.charAt(0).toUpperCase())) + '</div>' +
+                        '<div><div class="liti">' + esc(j.position || j.title || 'Role') + '</div>' +
+                        '<div class="lico">' + co + '</div>' +
+                        (date ? '<div class="lidate">' + esc(date) + '</div>' : '') +
+                        (j.description ? '<div class="lidesc">' + esc(j.description) + '</div>' : '') + '</div></div>';
+                });
+                h += '</div>';
+            }
+
+            const edu = raw.education || [];
+            if (edu.length) {
+                h += '<div class="licard lisec"><div class="lish">Education</div>';
+                edu.forEach(s => {
+                    const nm = esc(s.schoolName || 'School');
+                    const deg = [s.degree, s.fieldOfStudy || s.field].filter(Boolean).join(', ');
+                    const a = (s.startDate && (s.startDate.text || s.startDate.year)) || '';
+                    const b = (s.endDate && (s.endDate.text || s.endDate.year)) || '';
+                    const logo = s.schoolLogoUrl || (s.schoolLogo && s.schoolLogo.url) || '';
+                    h += '<div class="liexp"><div class="lilogo">' + (logo ? '<img src="' + esc(logo) + '" alt="">' : nm.charAt(0)) + '</div>' +
+                        '<div><div class="liti">' + nm + '</div>' +
+                        (deg ? '<div class="lico">' + esc(deg) + '</div>' : '') +
+                        (a ? '<div class="lidate">' + esc(a) + (b ? ' – ' + esc(b) : '') + '</div>' : '') + '</div></div>';
+                });
+                h += '</div>';
+            }
+
+            $('screen').innerHTML = h;
+            const more = $('moreBtn');
+            if (more) more.onclick = () => {
+                const box = $('aboutBox'), open = box.classList.toggle('clip');
+                more.textContent = open ? '…see more' : 'see less';
+            };
+            if (followers) $('phoneCap').textContent = followers.toLocaleString() + ' followers · scraped ' + new Date().toLocaleDateString('en-GB');
+        }
+
+        /* ── bucket helpers ─────────────────────────────────────── */
+        function bucketOf(e) {
+            if (e.bucket) return e.bucket;
+            const v = String(e.verdict || '').toLowerCase().replace(/\s+/g, '');
+            if (v === 'verified') return 'Publishable as written';
+            if (v === 'partial' || v === 'partiallyverified') return 'Publishable with attribution';
+            return 'Held back';
+        }
+        // Three labels: Verified (correct) / Partially Verified (not enough
+        // evidence, not contradicted) / Contradicted (the fact is wrong).
+        const stampFor = e => e.verdict === 'Verified'            ? ['cleared','VERIFIED']
+                            : e.verdict === 'Partially Verified'  ? ['attr','PARTIAL']
+                            : e.verdict === 'Contradicted'        ? ['held','CONTRADICTED']
+                            :                                       ['attr','PARTIAL'];
+
+        function rowHtml(e, i, key) {
+            const b = bucketOf(e), [cls, label] = stampFor(e);
+            const url = e.primary_source_url || '';
+            if (url) sourceUrls.add(url);
+            const src = url
+                ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(e.source_name || new URL(url, location.href).hostname.replace(/^www\./, '')) + '</a>'
+                : '<span>No source located</span>';
+            // Show additional sources (e.g. all Perplexity citations) as extra links.
+            let extraSrc = '';
+            const allSrc = (e.all_sources || []).filter(u => u && u !== url);
+            if (allSrc.length) {
+                extraSrc = allSrc.slice(0, 4).map(u => {
+                    sourceUrls.add(u);
+                    let host = u; try { host = new URL(u, location.href).hostname.replace(/^www\./, ''); } catch (_) {}
+                    return '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(host) + '</a>';
+                }).join('');
+            }
+            const tier = e.source_tier ? '<span class="tier">Tier ' + esc(e.source_tier) + '</span>' : '';
+            const n = e.independent_sources != null ? '<span>' + esc(e.independent_sources) + ' independent source' + (e.independent_sources === 1 ? '' : 's') + '</span>' : '';
+            const span = e.supporting_span || e.contradicting_span;
+            const isNew = !shownRefs.has(key);
+            shownRefs.add(key);
+
+            return '<div class="row" data-k="' + esc(key) + '">' +
+                '<button class="row-hit" aria-expanded="false">' +
+                '<span class="row-n">' + String(i + 1).padStart(2, '0') + '</span>' +
+                '<span><span class="row-claim">' + esc(e.claim_text || '') + '</span>' +
+                (e.claim_type ? '<span class="row-type">' + esc(e.claim_type) + '</span>' : '') + '</span>' +
+                '<span class="stamp ' + cls + (isNew ? ' press' : '') + '">' + label + '</span>' +
+                '</button>' +
+                '<div class="row-open"><div><div class="row-inner">' +
+                '<p class="finding">' + esc(e.reasoning || 'No reasoning recorded for this claim.') + '</p>' +
+                (span ? '<div class="evidence' + (cls === 'held' ? ' held' : '') + '">' + esc(span) + '</div>' : '') +
+                '<div class="prov">' + src + extraSrc + tier + n + '</div>' +
+                '</div></div></div></div>';
+        }
+
+        function wireRows(root) {
+            root.querySelectorAll('.row-hit').forEach(btn => {
+                btn.onclick = () => {
+                    const row = btn.closest('.row'), open = row.classList.toggle('open');
+                    btn.setAttribute('aria-expanded', open);
+                };
+            });
+        }
+
+        /* ── render the verdict ledger ──────────────────────────── */
+        function renderLedger(d) {
+            const ledger = d.verification_ledger || [];
+            const refusals = d.refusal_log || [];
+            const cleared = ledger.filter(e => bucketOf(e).startsWith('Publishable as'));
+            const attrib = ledger.filter(e => bucketOf(e).startsWith('Publishable with'));
+            const held = refusals.concat(ledger.filter(e => bucketOf(e) === 'Held back'));
+
+            $('tCleared').textContent = cleared.length;
+            $('tAttr').textContent = attrib.length;
+            $('tHeld').textContent = held.length;
+            $('tTotal').textContent = cleared.length + attrib.length + held.length;
+            $('ledgerSub').textContent = (d.executive_name || 'This profile') +
+                ', broken into single checkable facts. Each one carries its own verdict and its own source.';
+
+            let h = '';
+            if (cleared.length) {
+                h += '<div class="band">Verified</div>' +
+                    '<p class="band-note">The claim is correct and confirmed by two or more independent sources, at least one primary or named. Safe to use as written.</p>' +
+                    '<div class="rows">' + cleared.map((e, i) => rowHtml(e, i, 'c' + i)).join('') + '</div>';
+            }
+            if (attrib.length) {
+                h += '<div class="band">Partially verified</div>' +
+                    '<p class="band-note">Not contradicted, but there is not enough independent evidence to fully confirm it. True enough to use with attribution — name the source in the copy every time.</p>' +
+                    '<div class="rows">' + attrib.map((e, i) => rowHtml(e, i, 'a' + i)).join('') + '</div>';
+            }
+            if (!h) h = '<div class="note"><b>Nothing cleared.</b> No claim on this profile reached two independent sources. Check the held-back list below before going further.</div>';
+            $('bands').innerHTML = h;
+            wireRows($('bands'));
+
+            if (held.length) {
+                reveal('act-held');
+                $('heldRows').innerHTML = held.map((e, i) => rowHtml(e, i, 'h' + i)).join('');
+                wireRows($('heldRows'));
+            }
+
+            const gaps = d.gaps_analysis || [];
+            if (gaps.length) {
+                reveal('act-gaps');
+                $('gapList').innerHTML = gaps.map((g, i) =>
+                    '<div class="gap"><div class="gap-n">' + (i + 1) + '</div><div>' +
+                    '<span class="sev ' + esc(String(g.severity || 'medium').toLowerCase()) + '">' + esc(g.severity || 'Medium') + '</span>' +
+                    '<h4>' + esc(g.gap_title || 'Gap') + '</h4>' +
+                    '<p>' + esc(g.why_it_matters || '') + '</p></div></div>').join('');
+            }
+            $('srcCount').textContent = sourceUrls.size;
+        }
+
+        /* ── pending stream while the judge works ───────────────── */
+        let _pendingSig = '';
+        function renderPending(d) {
+            const claims = d.claims || [];
+            $('tTotal').textContent = claims.length;
+
+            // Map live per-claim verdicts (streamed as the judge finishes each).
+            const cache = d.evidence_cache || {};
+            const verdicts = {};
+            (d.live_verdicts || []).forEach(v => { verdicts[v.index] = v; });
+
+            // Signature includes evidence state AND live verdict, so a row
+            // updates the moment its verdict lands — but not on every idle poll.
+            const sig = claims.map(c => {
+                const id = c.id || c.claim_id;
+                const v = verdicts[id];
+                return id + ':' + (cache[id] ? 1 : 0) + ':' + (v ? v.verdict : '-');
+            }).join('|');
+            if (sig === _pendingSig) return;
+            _pendingSig = sig;
+
+            const stampFor = (v, ev) => {
+                if (v) {
+                    // Verdict decided — stamp it. Three labels.
+                    const map = {
+                        'Verified': ['cleared', 'VERIFIED'],
+                        'Partially Verified': ['attr', 'PARTIAL'],
+                        'Contradicted': ['held', 'CONTRADICTED'],
+                        'Unverified': ['attr', 'PARTIAL'],
+                    };
+                    const pair = map[v.verdict] || ['attr', 'PARTIAL'];
+                    return { cls: 'stamp ' + pair[0] + ' press', label: pair[1],
+                             note: v.source_name ? ('source: ' + v.source_name) : 'verdict recorded' };
+                }
+                if (ev) return { cls: 'stamp pending ready', label: 'READING', note: 'documents retrieved, awaiting judgement' };
+                return { cls: 'stamp pending', label: 'CHECKING', note: 'searching independent sources' };
+            };
+
+            $('bands').innerHTML =
+                '<div class="band">Under verification</div>' +
+                '<p class="band-note">Each claim is being searched twice: once to confirm it, once to break it. Verdicts are stamped the moment each one is decided.</p>' +
+                '<div class="rows">' + claims.map((c, i) => {
+                    const id = c.id || c.claim_id;
+                    const text = c.text || c.claim_text || String(c);
+                    const st = stampFor(verdicts[id], cache[id]);
+                    const decided = !!verdicts[id];
+                    const pulse = decided ? '' : '<span class="pulse"></span>';
+                    return '<div class="row"><div class="row-hit" style="cursor:default">' +
+                        '<span class="row-n">' + String(i + 1).padStart(2, '0') + '</span>' +
+                        '<span><span class="row-claim">' + esc(text) + '</span><span class="row-type">' + esc(st.note) + '</span></span>' +
+                        '<span class="' + st.cls + '">' + pulse + st.label + '</span></div></div>';
+                }).join('') + '</div>';
+        }
+
+        /* ── live work banner: keeps the reviewer engaged during the
+              long evidence-gathering + categorization phases ──────── */
+        const PHASE_COPY = {
+            ingesting_profile:   { t: 'Pulling the LinkedIn profile',       s: 'Reading the public profile and its history.' },
+            profile_ready:       { t: 'Profile captured',                   s: 'Now gathering independent open-web context.' },
+            researching_context: { t: 'Gathering open-web context',         s: 'Collecting independent background before any claim is tested.' },
+            extracting_claims:   { t: 'Breaking the profile into facts',    s: 'Splitting the profile into single, checkable claims.' },
+            gathering_evidence:  { t: 'Searching independent sources',      s: 'Each fact is searched twice — once to confirm, once to break it.' },
+            judging:             { t: 'Weighing the evidence',              s: 'Assigning a verdict and a named source to every fact.' },
+            categorizing:        { t: 'Categorizing the facts',            s: 'Sorting each fact into cleared, needs-attribution, or held back.' },
+        };
+        let _workStart = 0, _workClock = null;
+
+        function showWorkBanner(phase, done, total) {
+            const b = $('workBanner');
+            if (!b) return;
+            b.hidden = false;
+            const copy = PHASE_COPY[phase] || { t: 'Working', s: 'This can take a couple of minutes. Please keep this tab open.' };
+            $('workTitle').textContent = copy.t;
+            $('workSub').textContent = copy.s;
+
+            if (total > 0) {
+                const noun = (phase === 'judging' || phase === 'categorizing') ? 'facts judged'
+                           : (phase === 'gathering_evidence') ? 'facts researched' : 'facts';
+                $('workCount').textContent = done + ' / ' + total + ' ' + noun;
+                $('workFill').style.width = Math.round((done / total) * 100) + '%';
+            } else {
+                $('workCount').textContent = '—';
+                $('workFill').style.width = '8%';
+            }
+
+            if (!_workStart) _workStart = Date.now();
+            if (!_workClock) {
+                _workClock = setInterval(() => {
+                    const s = Math.floor((Date.now() - _workStart) / 1000);
+                    const el = $('workClock');
+                    if (el) el.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+                }, 1000);
+            }
+        }
+
+        function hideWorkBanner() {
+            const b = $('workBanner');
+            if (b) b.hidden = true;
+            clearInterval(_workClock); _workClock = null; _workStart = 0;
+        }
+
+        /* ── markdown → brief ───────────────────────────────────── */
+        function md2html(md) {
+            const inline = s => esc(s)
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+            const lines = md.replace(/\r/g, '').split('\n');
+            let out = '', i = 0;
+            const closeList = st => st ? '</' + st + '>' : '';
+            let list = null;
+
+            while (i < lines.length) {
+                const ln = lines[i];
+
+                if (/^\s*\|/.test(ln) && /^\s*\|[\s:|-]+\|\s*$/.test(lines[i + 1] || '')) {
+                    out += closeList(list); list = null;
+                    const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => inline(c.trim()));
+                    out += '<table><thead><tr>' + cells(ln).map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+                    i += 2;
+                    while (i < lines.length && /^\s*\|/.test(lines[i])) {
+                        out += '<tr>' + cells(lines[i]).map(c => '<td>' + c + '</td>').join('') + '</tr>'; i++;
+                    }
+                    out += '</tbody></table>'; continue;
+                }
+                let m;
+                if ((m = ln.match(/^(#{1,3})\s+(.*)$/))) {
+                    out += closeList(list); list = null;
+                    out += '<h' + m[1].length + '>' + inline(m[2]) + '</h' + m[1].length + '>'; i++; continue;
+                }
+                if (/^\s*([-*_])\1{2,}\s*$/.test(ln)) { out += closeList(list); list = null; out += '<hr>'; i++; continue; }
+                if ((m = ln.match(/^\s*[-*+]\s+(.*)$/))) {
+                    if (list !== 'ul') { out += closeList(list); out += '<ul>'; list = 'ul'; }
+                    out += '<li>' + inline(m[1]) + '</li>'; i++; continue;
+                }
+                if ((m = ln.match(/^\s*\d+[.)]\s+(.*)$/))) {
+                    if (list !== 'ol') { out += closeList(list); out += '<ol>'; list = 'ol'; }
+                    out += '<li>' + inline(m[1]) + '</li>'; i++; continue;
+                }
+                if (!ln.trim()) { out += closeList(list); list = null; i++; continue; }
+                out += closeList(list); list = null;
+                let p = ln; i++;
+                while (i < lines.length && lines[i].trim() && !/^(\s*[-*+#>]|\s*\d+[.)]|\s*\|)/.test(lines[i])) { p += ' ' + lines[i]; i++; }
+                out += '<p>' + inline(p) + '</p>';
+            }
+            return out + closeList(list);
+        }
+
+        /* ── pipeline ───────────────────────────────────────────── */
+        let loaderInterval = null;
+        const loaderMsgs = [
+            "Initializing verification",
+            "Scanning primary sources",
+            "Analyzing semantic clusters",
+            "Evaluating contradictions",
+            "Finalizing reputation diagnostic"
+        ];
+
+        async function start() {
+            const url = $('url').value.trim();
+            if (!/linkedin\.com\/in\//.test(url)) { toast('That does not look like a LinkedIn profile URL. It should contain linkedin.com/in/', true); $('url').focus(); return; }
+            $('goBtn').disabled = true; $('goBtn').textContent = 'Running';
+            ['act-subject', 'act-ledger', 'act-held', 'act-gaps', 'act-gate', 'act-brief'].forEach(a => $(a).hidden = true);
+            shownRefs.clear(); sourceUrls.clear(); profileDrawn = claimsDrawn = false;
+            _pendingSig = '';
+            $('trail').innerHTML = '';
+
+            clearInterval(loaderInterval);
+            hideWorkBanner();
+
+            log('run opened');
+            log('fetching profile');
+            reveal('act-subject'); skeleton(); progress(8);
+
+            // Add dynamic loader
+            const loaderEl = document.createElement('div');
+            loaderEl.className = 'tr ok loader-row';
+            loaderEl.id = 'activeLoader';
+            loaderEl.innerHTML = '<b>' + new Date().toTimeString().slice(0, 8) + '</b> <i><span id="loaderMsg">' + loaderMsgs[0] + '</span><span class="loader-dots">...</span></i>';
+            $('trail').appendChild(loaderEl);
             
-            html += `
-                <div class="li-exp-item">
-                    ${logoHtml}
-                    <div class="li-exp-content">
-                        <div class="li-exp-title">${name}</div>
-                        ${degStr ? `<div class="li-exp-company">${degStr}</div>` : ''}
-                        ${date ? `<div class="li-exp-date">${date}</div>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-        html += `</div>`;
-    }
+            let loaderIdx = 0;
+            loaderInterval = setInterval(() => {
+                loaderIdx = (loaderIdx + 1) % loaderMsgs.length;
+                const lm = $('loaderMsg');
+                if (lm) {
+                    lm.textContent = loaderMsgs[loaderIdx];
+                    if (loaderEl.querySelector('b')) {
+                        loaderEl.querySelector('b').textContent = new Date().toTimeString().slice(0, 8);
+                    }
+                }
+            }, 10000);
 
-    $('phoneContent').innerHTML = html;
-}
+            if (DEMO) { runDemo(); return; }
 
-function claimCard(entry,idx){
-    const v=(entry.verdict||'').toLowerCase().replace(/\s+/g,'');
-    const src=entry.primary_source_url?'<div class="claim-source"><a href="'+esc(entry.primary_source_url)+'" target="_blank">[Source: '+esc(entry.source_name||'Link')+']</a></div>':'';
-    const corr = entry.corroboration_count || 0;
-    let corrHtml = '';
-    if(corr >= 2) corrHtml = '<div class="corr-badge corr-2">✓✓ 2 independent sources</div>';
-    else if(corr === 1) corrHtml = '<div class="corr-badge corr-1">✓ 1 source only</div>';
-    else if(entry.verdict && entry.verdict !== 'Unverified') corrHtml = '<div class="corr-badge corr-0">✗ No independent confirmation</div>';
-    return '<div class="claim-card" style="animation-delay:'+(idx*.06)+'s"><div class="claim-top"><div class="claim-text">'+esc(entry.claim_text||'')+'</div><span class="verdict '+v+'">'+esc(entry.verdict||'Unknown')+'</span></div><div class="claim-reason">'+esc(entry.reasoning||'')+'</div>'+corrHtml+src+'</div>';
-}
-
-function renderGaps(gaps) {
-    if(!gaps || gaps.length === 0) { hideEl('gapsZone'); return; }
-    showEl('gapsZone');
-    $('gapsList').innerHTML = gaps.map(g => {
-        const sev = (g.severity || 'Medium').toLowerCase();
-        return `<div class="gap-card">
-            <span class="gap-severity ${sev}">${esc(g.severity || 'Medium')}</span>
-            <div class="gap-title">${esc(g.gap_title || 'Gap')}</div>
-            <div class="gap-reason">${esc(g.why_it_matters || '')}</div>
-        </div>`;
-    }).join('');
-}
-
-function renderResults(data){
-    const ledger=data.verification_ledger||[],refusals=data.refusal_log||[];
-    const total=ledger.length+refusals.length,pct=total>0?Math.round(ledger.length/total*100):0;
-    setTimeout(()=>animateRing(pct),100);
-    $('scoreExec').textContent=data.executive_name||'Executive';
-    $('scoreSub').textContent=ledger.length+' of '+total+' claims verified ('+pct+'% authority score)';
-    $('verifiedBadge').textContent=ledger.length;
-    $('verifiedList').innerHTML=ledger.length?ledger.map((e,i)=>claimCard(e,i)).join(''):'<div style="color:var(--text3);font-size:13px;padding:12px 0">No claims fully verified.</div>';
-    renderGaps(data.gaps_analysis);
-    if(refusals.length){showEl('quarantineZone');$('refusalList').innerHTML=refusals.map((e,i)=>claimCard(e,i)).join('')}
-    else hideEl('quarantineZone');
-}
-
-function renderMarkdown(md){
-    _reportMarkdown=md;
-    let h=md
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        .replace(/^### (.+)$/gm,'<h3>$1</h3>')
-        .replace(/^## (.+)$/gm,'<h2>$1</h2>')
-        .replace(/^# (.+)$/gm,'<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank">$1</a>')
-        .replace(/^- (.+)$/gm,'<li>$1</li>')
-        .replace(/\n\n/g,'</p><p>');
-    $('reportBody').innerHTML='<p>'+h+'</p>';
-}
-
-function copyReport(){navigator.clipboard.writeText(_reportMarkdown).then(()=>toast('Markdown copied to clipboard'))}
-
-async function startPipeline(){
-    const url=$('linkedinUrl').value.trim();
-    if(!url||!url.includes('linkedin.com/in/')){toast('Please enter a valid LinkedIn profile URL',true);return}
-    $('startBtn').disabled=true;$('startBtn').textContent='Running...';
-    show('scanScreen');hide('resultsArea');hide('reportSection');hide('profileCard');hide('approvalBar');
-    $('scanTitle').textContent='Scraping LinkedIn profile...';$('scanSubtitle').textContent=url;
-    setStage('s-ingest','active');
-    
-    let renderedProfile = false;
-    let renderedClaims = false;
-    
-    if(_pollInterval) clearInterval(_pollInterval);
-    
-    try{
-        const res=await fetch('/process',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({linkedin_url:url})});
-        if(!res.ok){const e=await res.json();throw new Error(e.detail||'Pipeline failed')}
-        const data=await res.json();_threadId=data.thread_id;
-        
-        _pollInterval = setInterval(async () => {
             try {
-                const sres = await fetch('/status/'+_threadId);
-                if(!sres.ok) return;
-                const sdata = await sres.json();
-                
-                // 1. Render Profile immediately when available
-                if (sdata.raw_profile && Object.keys(sdata.raw_profile).length > 0 && !renderedProfile) {
-                    setStage('s-ingest','done');
-                    setStage('s-enrich','active');
-                    renderProfileCard(sdata);
-                    show('profileCard');
-                    if (sdata.google_person_context) {
-                        setStage('s-enrich','done');
-                        setStage('s-extract','active');
-                        renderProfileCard(sdata); // re-render to inject web context
-                    }
-                    renderedProfile = true;
-                }
-                
-                // 2. Render Google Context if it finishes later
-                if (sdata.google_person_context && renderedProfile && !renderedClaims) {
-                    setStage('s-enrich','done');
-                    setStage('s-extract','active');
-                    renderProfileCard(sdata);
-                }
-                
-                // 3. Render Claims extraction live
-                if (sdata.claims && sdata.claims.length > 0 && sdata.status !== 'pending_review') {
-                    if(!renderedClaims) {
-                        setStage('s-extract','done');
-                        setStage('s-verify','active');
-                        show('resultsArea');
-                        $('scoreExec').textContent=sdata.executive_name||'Executive';
-                        $('scoreSub').textContent='Verifying ' + sdata.claims.length + ' claims across the web...';
-                        renderedClaims = true;
-                    }
-                    
-                    const html = sdata.claims.map((claimObj, i) => {
-                        const cText = claimObj.claim_text || String(claimObj);
-                        const evs = sdata.evidence_cache && sdata.evidence_cache[cText];
-                        const reason = (evs && evs.length > 0) ? `Gathered ${evs.length} pieces of evidence. Awaiting Judge...` : 'Deep-crawling web to gather evidence...';
-                        return `<div class="claim-card" style="animation-delay:${i*.06}s"><div class="claim-top"><div class="claim-text">${esc(cText)}</div><span class="verdict pending">Pending</span></div><div class="claim-reason">${reason}</div></div>`;
-                    }).join('');
-                    $('verifiedList').innerHTML = html;
-                    $('verifiedBadge').textContent = sdata.claims.length;
-                    hideEl('quarantineZone');
-                }
-                
-                // 4. Final state
-                if (sdata.status === 'pending_review') {
-                    clearInterval(_pollInterval);
-                    setStage('s-verify','done');
-                    setStage('s-pause','active');
-                    $('scanTitle').textContent='Profile scraped. Awaiting your review.';
-                    $('scanSubtitle').textContent=(sdata.total_claims||0)+' claims analysed for '+sdata.executive_name;
-                    renderProfileCard(sdata); 
-                    show('resultsArea');
-                    renderResults(sdata);
-                    show('approvalBar');
-                    $('startBtn').textContent='In review...';
-                } else if (sdata.status === 'error') {
-                    clearInterval(_pollInterval);
-                    toast('Pipeline encountered an error.', true);
-                    $('startBtn').disabled=false;
-                    $('startBtn').textContent='Run Diagnostic';
-                }
-            } catch(err) {
-                console.error("Polling error", err);
+                const r = await fetch('/process', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ linkedin_url: url }) });
+                if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || 'The pipeline did not start.');
+                threadId = (await r.json()).thread_id;
+                log('thread ' + String(threadId).slice(0, 8), 'ok');
+                poll();
+            } catch (e) {
+                fail(e.message);
             }
-        }, 2000);
-        
-    }catch(e){toast(e.message,true);$('startBtn').disabled=false;$('startBtn').textContent='Run Diagnostic';setStage('s-ingest','')}
-}
+        }
 
-async function saveFeedback(){
-    if(!_threadId){toast('No active session',true);return}
-    const feedback=$('feedbackInput').value.trim();
-    if(!feedback){toast('Please enter some feedback first',true);return}
-    $('saveFeedbackBtn').disabled=true;$('saveFeedbackBtn').textContent='Saving...';
-    try{
-        const res=await fetch('/feedback/'+_threadId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({human_feedback:feedback})});
-        if(!res.ok){throw new Error('Failed to save feedback')}
-        toast('Feedback saved (report NOT generated yet)');$('saveFeedbackBtn').textContent='💾 Feedback Saved ✓';
-        setTimeout(()=>{$('saveFeedbackBtn').disabled=false;$('saveFeedbackBtn').textContent='💾 Save Feedback'},2000);
-    }catch(e){toast(e.message,true);$('saveFeedbackBtn').disabled=false;$('saveFeedbackBtn').textContent='💾 Save Feedback'}
-}
+        function fail(msg) {
+            clearInterval(pollTimer);
+            clearInterval(loaderInterval);
+            const activeLdr = $('activeLoader');
+            if (activeLdr) activeLdr.remove();
+            
+            log(msg, 'warn');
+            toast(msg, true);
+            $('goBtn').disabled = false; $('goBtn').textContent = 'Run the audit';
+            $('bands').innerHTML = '<div class="note"><b>The run stopped.</b> ' + esc(msg) +
+                ' Nothing was written and nothing was published. Fix the cause and run it again, or open this page with ?demo=1 to see a completed audit.</div>';
+            reveal('act-ledger');
+        }
 
-async function approvePipeline(){
-    if(!_threadId){toast('No active session',true);return}
-    const feedback=$('feedbackInput').value.trim();
-    $('approveBtn').disabled=true;$('approveBtn').textContent='Generating report...';toast('Human approved. Generating final diagnostic brief...');
-    try{
-        const res=await fetch('/approve/'+_threadId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({human_feedback:feedback})});
-        if(!res.ok){const e=await res.json();throw new Error(e.detail||'Synthesis failed')}
-        const data=await res.json();
-        if(data.final_diagnostic){setStage('s-pause','done');show('reportSection');renderMarkdown(data.final_diagnostic);toast('Diagnostic report ready');$('approveBtn').textContent='Report Generated ✓'}
-        else{toast('No report returned',true);$('approveBtn').disabled=false;$('approveBtn').textContent='✓ Approve & Generate Report'}
-    }catch(e){toast(e.message,true);$('approveBtn').disabled=false;$('approveBtn').textContent='✓ Approve & Generate Report'}
-}
+        function poll() {
+            clearInterval(pollTimer);
+            let ticks = 0;
+            pollTimer = setInterval(async () => {
+                ticks++;
+                try {
+                    const r = await fetch('/status/' + threadId);
+                    if (r.status === 429) { log('rate limited, backing off', 'warn'); return; }
+                    if (!r.ok) return;
+                    const d = await r.json();
+                    apply(d, ticks);
+                } catch { if (ticks > 5) log('status endpoint unreachable, retrying', 'warn'); }
+            }, 2000);
+        }
 
-function resetAll(){
-    _threadId=null;_reportMarkdown='';$('linkedinUrl').value='';
-    if(_pollInterval) clearInterval(_pollInterval);
-    $('startBtn').disabled=false;$('startBtn').textContent='Run Diagnostic';
-    hide('scanScreen');hide('resultsArea');hide('reportSection');hide('profileCard');hide('approvalBar');
-    $('feedbackInput').value='';$('approveBtn').disabled=false;$('approveBtn').textContent='✓ Approve & Generate Report';
-    $('saveFeedbackBtn').disabled=false;$('saveFeedbackBtn').textContent='💾 Save Feedback';
-    ['s-ingest','s-enrich','s-extract','s-verify','s-pause'].forEach(id=>setStage(id,''));
-    $('verifiedList').innerHTML='';$('refusalList').innerHTML='';$('phoneContent').innerHTML='';
-    hideEl('gapsZone');hideEl('quarantineZone');
-    animateRing(0);
-}
-</script>
+        function apply(d, ticks) {
+            if (d.raw_profile && Object.keys(d.raw_profile).length && !profileDrawn) {
+                profileDrawn = true; drawPhone(d); progress(22);
+                log('profile parsed', 'ok');
+                log('searching open web');
+            }
+            if (d.google_person_context && $('dosTxt').classList.contains('wait')) {
+                $('dosName').textContent = d.executive_name || 'Open web context';
+                $('dosMeta').textContent = 'Independent context, gathered before any claim was tested';
+                $('dosTxt').classList.remove('wait');
+                $('dosTxt').innerHTML = d.google_person_context;
+                progress(34); log('open web context found', 'ok');
+            }
+            if (d.claims && d.claims.length && d.status !== 'pending_review') {
+                if (!claimsDrawn) { claimsDrawn = true; reveal('act-ledger'); log(d.claims.length + ' claims extracted', 'ok'); window._lastDone = -1; }
+                renderPending(d);
+                const done = Object.keys(d.evidence_cache || {}).length;
+                progress(Math.min(88, 40 + (done / Math.max(1, d.claims.length)) * 48));
+                if (window._lastDone !== done) {
+                    log('verifying ' + done + '/' + d.claims.length);
+                    window._lastDone = done;
+                }
+            }
+
+            // Keep the reviewer engaged while the backend gathers evidence and
+            // categorizes facts (these phases can each run for minutes).
+            if (d.status !== 'pending_review' && d.status !== 'completed' && d.status !== 'error') {
+                const total = d.claims_count || (d.claims ? d.claims.length : 0);
+                // During judging, count decided verdicts; before that, evidence gathered.
+                const done = (d.judged_count && d.judged_count > 0)
+                    ? d.judged_count
+                    : ((d.evidence_ready != null) ? d.evidence_ready
+                       : Object.keys(d.evidence_cache || {}).length);
+                showWorkBanner(d.phase, done, total);
+            }
+
+            if (d.status === 'pending_review') {
+                clearInterval(pollTimer);
+                clearInterval(loaderInterval);
+                const activeLdr = $('activeLoader');
+                if (activeLdr) activeLdr.remove();
+                hideWorkBanner();
+
+                progress(92);
+                drawPhone(d);
+                reveal('act-ledger'); renderLedger(d);
+                log('judging complete', 'ok');
+                log('held for human sign-off', 'warn');
+                reveal('act-gate');
+                $('goBtn').textContent = 'Awaiting sign-off';
+            } else if (d.status === 'error') {
+                hideWorkBanner();
+                fail(d.error || 'The pipeline reported an error.');
+            }
+        }
+
+        async function saveNotes() {
+            if (!threadId && !DEMO) return toast('No run is open.', true);
+            const v = $('notes').value.trim();
+            if (!v) return toast('Write something first, then save.', true);
+            $('saveBtn').disabled = true; $('saveBtn').textContent = 'Saving';
+            try {
+                if (!DEMO) {
+                    const r = await fetch('/feedback/' + threadId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ human_feedback: v }) });
+                    if (!r.ok) throw new Error('Notes were not saved.');
+                }
+                log('reviewer notes saved', 'ok');
+                toast('Notes saved. The brief has not been written yet.');
+                $('saveBtn').textContent = 'Notes saved';
+            } catch (e) { toast(e.message, true); $('saveBtn').textContent = 'Save notes'; }
+            finally { setTimeout(() => { $('saveBtn').disabled = false; $('saveBtn').textContent = 'Save notes'; }, 2200); }
+        }
+
+        async function approve() {
+            if (!threadId && !DEMO) return toast('No run is open.', true);
+            const v = $('notes').value.trim();
+            $('approveBtn').disabled = true; $('approveBtn').textContent = 'Writing';
+            $('sigLine').textContent = 'Approved by reviewer · ' + new Date().toLocaleString('en-GB');
+            log('human approval recorded', 'ok');
+            try {
+                let md;
+                if (DEMO) { await new Promise(r => setTimeout(r, 900)); md = DEMO_REPORT; }
+                else {
+                    const r = await fetch('/approve/' + threadId, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ human_feedback: v }) });
+                    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || 'The brief was not generated.');
+                    md = (await r.json()).final_diagnostic;
+                }
+                if (!md) throw new Error('The pipeline returned no brief.');
+                reportMd = md;
+                $('briefBody').innerHTML = md2html(md);
+                reveal('act-brief'); progress(100);
+                log('brief written', 'ok');
+                $('approveBtn').textContent = 'Brief written';
+                $('goBtn').textContent = 'Complete';
+            } catch (e) {
+                toast(e.message, true); log(e.message, 'warn');
+                $('approveBtn').disabled = false; $('approveBtn').textContent = 'Approve and write the brief';
+                $('sigLine').textContent = 'Unsigned';
+            }
+        }
+
+        function resetAll() {
+            clearInterval(pollTimer);
+            clearInterval(loaderInterval);
+            hideWorkBanner();
+            threadId = null; reportMd = ''; shownRefs.clear(); sourceUrls.clear();
+            profileDrawn = claimsDrawn = false; _pendingSig = '';
+            $('url').value = ''; $('notes').value = ''; $('trail').innerHTML = '';
+            $('srcCount').textContent = '0'; $('sigLine').textContent = 'Unsigned';
+            ['act-subject', 'act-ledger', 'act-held', 'act-gaps', 'act-gate', 'act-brief'].forEach(a => $(a).hidden = true);
+            $('goBtn').disabled = false; $('goBtn').textContent = 'Run the audit';
+            $('approveBtn').disabled = false; $('approveBtn').textContent = 'Approve and write the brief';
+            progress(0);
+            $('act-intake').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        $('goBtn').onclick = start;
+        $('url').addEventListener('keydown', e => { if (e.key === 'Enter') start(); });
+        $('saveBtn').onclick = saveNotes;
+        $('approveBtn').onclick = approve;
+        $('resetBtn').onclick = resetAll;
+        $('resetBtn2').onclick = resetAll;
+        $('copyBtn').onclick = () => navigator.clipboard.writeText(reportMd)
+            .then(() => toast('Brief copied as Markdown'))
+            .catch(() => toast('Copy failed. Select the text and copy it manually.', true));
+
+        /* ── demo fixture, so the link always opens ─────────────── */
+        const DEMO_STATE = {
+            executive_name: 'Divyank Turakhia',
+            raw_profile: {
+                firstName: 'Div', lastName: 'Turakhia',
+                headline: 'Entrepreneur. Investor. Aviator. Adventurer.',
+                location: 'Dubai, United Arab Emirates',
+                followerCount: 6190, connectionsCount: 3764,
+                about: "Div Turakhia is an Indian-born serial tech entrepreneur, self-made billionaire, and investor.\n\nRecognized by Forbes and Hurun as the youngest Indian billionaire globally (2016–2019), he has founded, scaled, and successfully exited multiple ventures in online advertising, domain services, and AI-driven businesses.\n\nA self-taught programmer, Div began coding at age 8 and consulting for major corporations by 14. His journey is marked by milestones: a net worth of over $1M at 18, $100M at 23, and surpassing $1B at 33.\n\n• Ai.tech (Present) – founded Jan 2022, a startup studio whose portfolio companies employ over 1600 people worldwide.\n• Media.net (2010–2016, 2023–Present) – scaled into one of the world's top five online advertising businesses, culminating in a $900M acquisition in 2016.\n• Skenzo (2005–2008) – founded at 23 with $20K, reaching a $200M+ valuation before a successful exit in 2008.\n• Directi (1998–2014) – co-founded at age 16 with just $500, culminating in a $160M exit in 2014.\n• Radix (2012–Present) – co-founded to acquire top-tier TLDs, remaining fully co-owned by the Turakhia brothers.",
+                experience: [
+                    { position: 'Founder & Managing Partner', companyName: 'Ai.tech', startDate: { text: 'Jan 2022' }, endDate: { text: 'Present' }, duration: '4 yrs 9 mos', description: "A startup studio and holding company building businesses that harness AI and machine learning." },
+                    { position: 'Founder', companyName: 'Media.net', startDate: { text: 'Mar 2023' }, endDate: { text: 'Present' }, duration: '3 yrs 7 mos', description: 'Fully acquired by Div Turakhia in 2023, now a Top 10 Global SSP.' },
+                    { position: 'Founder', companyName: 'Radix', startDate: { text: '2012' }, endDate: { text: 'Present' }, duration: '14 yrs 9 mos', description: 'Co-founded with significant personal investments to acquire top-tier TLDs.' },
+                    { position: 'Founder & CEO', companyName: 'Media.net', startDate: { text: '2010' }, endDate: { text: '2018' }, duration: '8 yrs' },
+                    { position: 'Founder & CEO', companyName: 'Skenzo', startDate: { text: '2005' }, endDate: { text: '2018' }, duration: '13 yrs' },
+                    { position: 'Founder', companyName: 'Directi', startDate: { text: '1998' }, endDate: { text: '2014' }, duration: '16 yrs' }
+                ]
+            },
+            google_person_context: "Divyank \"Div\" Turakhia, born 29 January 1982, is an Indian-born entrepreneur and investor based in Dubai. He co-founded Directi with his brother Bhavin in 1998, founded Media.net in 2010 and sold it in 2016 to a consortium led by Beijing Miteno, and founded the startup studio Ai.tech in January 2022. He appeared on the Forbes list as the youngest Indian billionaire in 2016, 2017 and 2018.",
+            claims: [],
+            status: 'pending_review',
+            verification_ledger: [
+                { claim_text: 'Media.net was sold in 2016 for $900M to a consortium led by Beijing Miteno.', claim_type: 'transaction', verdict: 'Verified', bucket: 'Publishable as written', independent_sources: 3, source_tier: 'S', source_name: 'TechCrunch', primary_source_url: 'https://techcrunch.com/2016/08/22/media-net-sold-to-chinese-consortium-for-900m/', reasoning: 'Reported independently by TechCrunch and Domain Name Wire on the day of announcement, with matching consideration and buyer detail. Neither traces to the seller\'s press release. The figure is also consistent across later Forbes coverage.', supporting_span: 'Media.net has been acquired by a Chinese consortium in a deal valuing the company at $900 million.' },
+                { claim_text: 'Directi was co-founded in 1998 by Divyank and Bhavin Turakhia on roughly $500.', claim_type: 'role', verdict: 'Verified', bucket: 'Publishable as written', independent_sources: 3, source_tier: 'S', source_name: 'CNBC Make It', primary_source_url: 'https://www.cnbc.com/make-it/', reasoning: 'Corroborated by CNBC, the UAE Ministry of Economy and Tourism, and Directi\'s own record. Note the profile lists the role as "Founder"; every source describes it as a joint founding with his brother. Publish as co-founded.' },
+                { claim_text: 'He stepped down as Media.net CEO in October 2018 and became an advisor.', claim_type: 'role', verdict: 'Verified', bucket: 'Publishable as written', independent_sources: 2, source_tier: 'P', source_name: 'Domain Name Wire', primary_source_url: 'https://domainnamewire.com/', reasoning: 'Company announcement dated 15 October 2018, independently covered by Domain Name Wire with the successor named.' },
+                { claim_text: 'Recognised as the youngest Indian billionaire globally from 2016 to 2019.', claim_type: 'award', verdict: 'Partially Verified', bucket: 'Publishable with attribution', independent_sources: 2, source_tier: 'S', source_name: 'Milken Institute', primary_source_url: 'https://milkeninstitute.org/', reasoning: 'The recognition is real for 2016, 2017 and 2018. No source supports 2019, including his own Milken speaker biography, which stops at 2018. Publish the three-year range and name Forbes.' },
+                { claim_text: "Ai.tech's portfolio companies employ over 1,600 people worldwide.", claim_type: 'headcount', verdict: 'Partially Verified', bucket: 'Publishable with attribution', independent_sources: 1, source_tier: 'S', source_name: 'Business Standard', primary_source_url: 'https://www.business-standard.com/', reasoning: 'Carried by Business Standard and others, but all instances report the same ASK Private Wealth and Hurun India Unicorn Report 2025, whose inputs are supplied by the company. One origin wearing several mastheads. Attribute to the Hurun report rather than stating it as fact.' },
+                { claim_text: 'Net worth surpassed $1 billion.', claim_type: 'self_milestone', verdict: 'Partially Verified', bucket: 'Publishable with attribution', independent_sources: 2, source_tier: 'S', source_name: 'Forbes India', primary_source_url: 'https://www.forbesindia.com/', reasoning: 'Forbes India lists the brothers as a single joint entry rather than individually, so every published figure covers both. Publish a dated figure, name the ranking body, and never publish an undated net worth.' }
+            ],
+            refusal_log: [
+                { claim_text: 'Directi culminated in a $160M exit in 2014.', claim_type: 'transaction', verdict: 'Contradicted', bucket: 'Held back', independent_sources: 4, source_tier: 'P', source_name: 'SEC EDGAR — Endurance International Form 10-Q', primary_source_url: 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany', reasoning: 'This claim has four sources across three countries and still fails. The acquirer filed the number with the SEC: a final purchase price of $109.8 million, made up of $82.6 million in cash and 2,269,579 shares. Every source carrying $160M is downstream of the same 2016 write-up. Separately, what sold was the web presence business, not Directi as a whole. Wrong on the number and wrong on the object, so it is blocked on both counts.', contradicting_span: 'The final purchase price was $109.8 million, consisting of $82.6 million in cash and 2,269,579 shares of common stock.' },
+                { claim_text: "Media.net's SSP business was re-acquired in full in 2023.", claim_type: 'transaction', verdict: 'Unverified', bucket: 'Held back', independent_sources: 0, source_tier: '—', source_name: 'No source located', reasoning: 'No independent trace exists. No filing, no press release, no coverage in AdExchanger, Adweek or Domain Name Wire. The 2016 sale is documented in detail, so a full buyback of the same asset would normally leave a comparable trail. The only source is the profile making the claim.' },
+                { claim_text: 'Net worth surpassed $1B at age 33.', claim_type: 'self_milestone', verdict: 'Contradicted', bucket: 'Held back', independent_sources: 3, source_tier: 'S', source_name: 'Directi', primary_source_url: 'https://www.directi.com/', reasoning: 'His own company website says 34, as do CNBC, the UAE Ministry of Economy and the Milken biography. Born January 1982, he was 34 when the milestone was reported in 2016. The profile contradicts its own corporate source.' },
+                { claim_text: 'Skenzo reached a $200M+ valuation before a successful exit in 2008.', claim_type: 'transaction', verdict: 'Contradicted', bucket: 'Held back', independent_sources: 1, source_tier: 'S', source_name: 'Forbes India', primary_source_url: 'https://www.forbesindia.com/', reasoning: 'Forbes India reports a minority stake sale to Ashmore Group in 2008, a stake the brothers later bought back, after which Skenzo was folded into Media.net. That is a minority round later unwound, not an exit. The profile also dates Skenzo 2005 to 2008 in one section and 2005 to 2018 in another.' },
+                { claim_text: 'Media.net is one of the world\'s top five online advertising businesses.', claim_type: 'ranking', verdict: 'Unverified', bucket: 'Held back', independent_sources: 0, source_tier: 'T', source_name: 'Media.net press release', primary_source_url: 'https://www.media.net/', reasoning: 'This exact sentence appears in Media.net\'s own October 2018 release and was copied into Wikipedia, a UAE government page and dozens of aggregators. Text-level clustering collapses all of them into a single self-originating source. No independent ranking supports it.' }
+            ],
+            gaps_analysis: [
+                { severity: 'Critical', gap_title: 'The verifiable record stops in 2018, but the company is four years old', why_it_matters: 'Everything independently documented sits between 2014 and 2018: the Media.net sale, the CEO handover, the Forbes rankings. Ai.tech, founded in 2022 and now the primary vehicle, has one independent press moment, and it is company-supplied. For a man ranked among India\'s richest, 6,190 followers is not a small presence, it is an absence. The public story reads in past tense, which is the wrong tense for someone hiring and partnering in AI right now.' },
+                { severity: 'High', gap_title: 'The strongest lines all trace back to one press release', why_it_matters: 'Top five by market cap, second-largest in contextual advertising, third-largest ad-tech deal. All three originate in the company\'s own 2016 and 2018 communications and were then laundered through Wikipedia and a government page, which makes them look independently sourced. Any counterparty who traces one traces all three, and the collapse takes the credible parts of the paragraph with it.' },
+                { severity: 'Medium', gap_title: 'The profile contradicts itself and its own companies\' websites', why_it_matters: 'Skenzo is dated two ways, Media.net is dated two ways, the billionaire milestone is 33 here and 34 on directi.com, and he is tagged Founder of two companies the record describes as co-founded with his brother. In DIFC, where counterparties run exactly this check, the unilateral Founder tag is the highest-cost, lowest-benefit line on the page.' }
+            ]
+        };
+
+        const DEMO_REPORT = `# Executive Reputation Diagnostic
+
+**Subject:** Divyank "Div" Turakhia, Founder, Ai.tech, Dubai
+**Claims tested:** 11 · **Cleared:** 3 · **Attribution required:** 3 · **Held back:** 5
+
+The record behind this profile is unusually strong. The profile itself is not. Two numbers on it are contradicted by primary sources, three of its most repeated superlatives trace back to a single press release, and the profile contradicts itself in four places. None of this is fatal. All of it is findable by a diligence analyst in an afternoon.
+
+## What you can publish as written
+
+- Co-founded Directi in 1998 at sixteen with his brother, on about $500
+- Founded Media.net in 2010 in Dubai and sold it in 2016 for $900 million
+- Stepped down as Media.net CEO in October 2018
+
+## What needs a citation attached
+
+| Claim | Required attribution |
+| --- | --- |
+| Youngest Indian billionaire | Name Forbes, and use 2016 to 2018, not 2019 |
+| 1,600 people across Ai.tech | Attribute to the ASK and Hurun India Unicorn Report 2025 |
+| Net worth over $1 billion | Date it, name the ranking body, note the joint listing |
+
+## What the system refused
+
+The strongest refusal is the $160 million Directi exit, because it would have survived almost any check. It has four sources in three countries, including the family's own websites. It is still wrong. Endurance International filed the number with the SEC: a final purchase price of **$109.8 million**. Source count is not evidence. Source independence is, and independence has to be traced rather than assumed.
+
+Also held back: the 2023 Media.net re-acquisition, the claim of crossing $1 billion at 33, the Skenzo exit, and the top-five ranking.
+
+## Where the profile is thin
+
+1. Everything verifiable is 2014 to 2018, while the current company is four years old and nearly undocumented.
+2. The load-bearing superlatives are circular and the circle closes on one press release.
+3. The profile contradicts itself and its own corporate sites, and claims sole founding of companies the record describes as joint.
+
+## What we would do first
+
+Retire the four blocked claims, attribute the three that need it, and build the 2022 to 2026 record that currently does not exist. The verified material is strong enough to carry a profile on its own. The unverifiable material is the only thing putting it at risk.`;
+
+        function runDemo() {
+            const steps = [
+                [700, () => { drawPhone(DEMO_STATE); progress(22); log('profile parsed', 'ok'); log('searching open web'); }],
+                [1500, () => { $('dosName').textContent = DEMO_STATE.executive_name; $('dosMeta').textContent = 'Independent context, gathered before any claim was tested'; $('dosTxt').classList.remove('wait'); $('dosTxt').textContent = DEMO_STATE.google_person_context; progress(34); log('open web context found', 'ok'); }],
+                [2400, () => { reveal('act-ledger'); log('11 claims extracted', 'ok'); renderPending({ claims: DEMO_STATE.verification_ledger.concat(DEMO_STATE.refusal_log), evidence_cache: {} }); progress(48); }],
+                [3600, () => { log('collapsing duplicate sources'); progress(62); }],
+                [4600, () => { log('checking SEC filings', 'ok'); progress(76); }],
+                [5600, () => { log('judging complete', 'ok'); renderLedger(DEMO_STATE); progress(92); log('2 claims contradicted', 'warn'); log('held for human sign-off', 'warn'); reveal('act-gate'); $('goBtn').textContent = 'Awaiting sign-off'; }]
+            ];
+            steps.forEach(([t, fn]) => setTimeout(fn, t));
+        }
+
+        if (DEMO) {
+            $('url').value = 'https://www.linkedin.com/in/divyankturakhia/';
+            log('demo fixture loaded');
+        }
+    </script>
 </body>
+
 </html>
