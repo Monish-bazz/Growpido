@@ -67,7 +67,7 @@ class HybridResearcher:
                      URLs and returns the raw page text for granular checking.
     """
 
-    PPLX_ENDPOINT = "https://api.aicredits.in/v1/chat/completions"
+    PPLX_ENDPOINT = "https://api.perplexity.ai/chat/completions"
     JINA_PREFIX = "https://r.jina.ai/"
     MAX_DEEP_CHARS = 3000          # cap per-page text to control token cost
     MAX_CITATIONS_TO_CRAWL = 3     # deep-dive into top N urls
@@ -79,10 +79,10 @@ class HybridResearcher:
         serpapi_api_key: Optional[str] = None,
         tavily_api_key: Optional[str] = None,
     ):
-        self.pplx_key = perplexity_api_key or os.getenv("ai_credit", "")
+        self.pplx_key = perplexity_api_key or os.getenv("PERPLEXITY_API_KEY", "")
         self.serpapi_key = serpapi_api_key or os.getenv("SERPAPI_API_KEY", "")
         self.tavily_key = tavily_api_key or os.getenv("TAVILY_API_KEY", "")
-        self.use_perplexity = os.getenv("USE_AICREDITS", "true").lower() == "true"
+        self.use_perplexity = os.getenv("USE_PERPLEXITY", "true").lower() == "true" or os.getenv("USE_PERPLEXITY_FALLBACK", "true").lower() == "true"
 
         if not self.pplx_key or not self.use_perplexity:
             logger.warning("Perplexity layer disabled (API key missing or USE_PERPLEXITY=false).")
