@@ -400,8 +400,8 @@ class HybridResearcher:
             return {"ai_answer": "", "citations": [], "organic_urls": []}
 
         try:
-            client = serpapi.Client(api_key=self.serpapi_key)
             query = f"Verify: {executive_name} {claim}"
+            client = serpapi.Client(api_key=self.serpapi_key)
 
             logger.info("[GoogleAIMode] QUERY: %s", query)
 
@@ -481,12 +481,12 @@ class HybridResearcher:
             return {"ai_summary": "", "citations": [], "organic_urls": []}
 
         try:
-            client = serpapi.Client(api_key=self.serpapi_key)
-
             query = f"Provide a detailed and comprehensive biography of {executive_name}"
             if company:
                 query += f", primarily known for {company}"
             query += ". Describe their full career history, major professional achievements, public reputation, controversies, and key business milestones in detail. -site:linkedin.com"
+
+            client = serpapi.Client(api_key=self.serpapi_key)
 
             results = client.search({
                 "engine": "google_ai_mode",
