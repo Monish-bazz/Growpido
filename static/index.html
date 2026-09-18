@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Executive Reputation Diagnostic — Growpido</title>
+    <title>Executive Reputation Diagnostic — NoCap.ai</title>
     <meta name="description" content="Every claim on a profile, checked against a source we can name.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1554,6 +1554,98 @@
                 transition-duration: .01ms !important
             }
         }
+        
+        /* ─── thermal receipt printer UI ────────────────────────── */
+        .printer-machine {
+            background: #191C19;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 24px;
+            box-shadow: inset 0 -4px 12px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+            margin-top: 30px;
+        }
+        .printer-slot {
+            height: 6px;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+        .receipt-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding-bottom: 25px; 
+            z-index: 5;
+            margin: 0 16px;
+        }
+        .thermal-receipt {
+            background: #FFFDF0; 
+            color: #1A1A24; 
+            padding: 40px 32px 50px 32px;
+            font-family: var(--mono);
+            font-size: 14.5px;
+            line-height: 1.5;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            transform: translateY(-100%);
+            transition: transform 6s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+        }
+        .thermal-receipt::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -15px;
+            width: 100%;
+            height: 15px;
+            background-image: radial-gradient(circle at 10px 0px, #FFFDF0 10px, transparent 11px);
+            background-size: 20px 20px;
+            background-position: 0 0;
+            background-repeat: repeat-x;
+        }
+        .receipt-wrapper.printing .thermal-receipt {
+            transform: translateY(0);
+        }
+
+        .thermal-receipt h1, .thermal-receipt h2, .thermal-receipt h3 { 
+            font-family: var(--mono); 
+            text-transform: uppercase; 
+            border-bottom: 1px dashed #1A1A24; 
+            padding-bottom: 8px; 
+            margin-bottom: 18px; 
+            margin-top: 28px; 
+            font-weight: 600; 
+            font-size: 18px; 
+            letter-spacing: 0.5px;
+        }
+        .thermal-receipt h1 { font-size: 22px; border-bottom: 2px dashed #1A1A24; }
+        .thermal-receipt p { margin-bottom: 16px; }
+        .thermal-receipt ul { padding-left: 20px; margin-bottom: 18px; }
+        .thermal-receipt li { margin-bottom: 8px; }
+        .thermal-receipt table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+        .thermal-receipt th, .thermal-receipt td { border-bottom: 1px dotted #1A1A24; padding: 12px 8px; text-align: left; vertical-align: top; }
+        .thermal-receipt th { font-weight: 600; }
+        .thermal-receipt a { color: #1A1A24; text-decoration: underline; text-underline-offset: 3px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            .receipt-wrapper, .receipt-wrapper * { visibility: visible; }
+            .receipt-wrapper {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: visible;
+            }
+            .thermal-receipt {
+                box-shadow: none;
+                transform: none !important;
+                background: white; 
+                padding: 0;
+            }
+            .thermal-receipt::after { display: none; }
+        }
     </style>
 </head>
 
@@ -1564,7 +1656,7 @@
     <div class="frame">
 
         <aside class="spine">
-            <div class="spine-mark">Growpido<span>Reputation diagnostics</span></div>
+            <div class="spine-mark">NoCap.ai<span>Reputation diagnostics</span></div>
             <div class="spine-hr"></div>
             <div class="spine-h">Audit trail</div>
             <div id="trail"></div>
@@ -1712,8 +1804,16 @@
                     <h2>The brief</h2>
                 </div>
                 <p class="act-sub">One page, sourced throughout, ready to go to the client.</p>
-                <div class="brief" id="briefBody"></div>
+                
+                <div class="printer-machine">
+                    <div class="printer-slot"></div>
+                </div>
+                <div class="receipt-wrapper" id="receiptWrapper">
+                    <div class="brief thermal-receipt" id="briefBody"></div>
+                </div>
+
                 <div class="acts" style="margin-top:22px">
+                    <button class="b2" id="downloadPdfBtn">Download PDF</button>
                     <button class="b2" id="copyBtn">Copy as Markdown</button>
                     <button class="b2 danger" id="resetBtn2">Run another profile</button>
                 </div>
@@ -2309,6 +2409,8 @@
                 reportMd = md;
                 $('briefBody').innerHTML = md2html(md);
                 reveal('act-brief'); progress(100);
+                $('act-brief').scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => $('receiptWrapper').classList.add('printing'), 600);
                 log('brief written', 'ok');
                 $('approveBtn').textContent = 'Brief written';
                 $('goBtn').textContent = 'Complete';
@@ -2340,6 +2442,7 @@
         $('approveBtn').onclick = approve;
         $('resetBtn').onclick = resetAll;
         $('resetBtn2').onclick = resetAll;
+        $('downloadPdfBtn').onclick = () => window.print();
         $('copyBtn').onclick = () => navigator.clipboard.writeText(reportMd)
             .then(() => toast('Brief copied as Markdown'))
             .catch(() => toast('Copy failed. Select the text and copy it manually.', true));

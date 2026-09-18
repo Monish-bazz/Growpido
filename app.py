@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Growpido Track B: Executive Reputation Diagnostic Engine",
+    title="NoCap.ai Track B: Executive Reputation Diagnostic Engine",
     description=(
         "Fact-checking pipeline for executive LinkedIn profiles. "
         "Extracts claims, verifies against the open web, and generates "
@@ -369,7 +369,7 @@ async def serve_frontend():
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return HTMLResponse(
-        "<h1>Growpido Track B</h1><p>Place index.html in static/ folder.</p>"
+        "<h1>NoCap.ai Track B</h1><p>Place index.html in static/ folder.</p>"
     )
 
 

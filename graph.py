@@ -1411,6 +1411,7 @@ def judge_claims(state: GraphState, config: Optional[RunnableConfig] = None) -> 
         "You will be given a SINGLE claim and the evidence retrieved for it. Each piece of evidence has a URL and text snippet.\n"
         "Evaluate the evidence and assign EXACTLY ONE of THREE verdicts: "
         "Verified, Partially Verified, or Contradicted.\n"
+        "SOURCE HIERARCHY: Official institutional registries, university directories, SEC filings, and primary corporate bios completely overrule third-party news blogs or aggregators. If a secondary source inverts facts (e.g. swapping degree institutions) compared to official sources, mark the claim as CONTRADICTED.\n"
         "RULES (use the full 3-label scale):\n"
         "1. Verified: The claim is CORRECT and confirmed. Two or more independent sources (not copies of each other) confirm it, at least one being a primary/named source.\n"
         "2. Partially Verified: The claim is NOT contradicted, but there isn't enough independent evidence to fully confirm it — e.g. some support exists but it is thin, traces only to the subject's own site/press release/a single origin, or a minor detail is uncertain. This means 'publishable WITH attribution'. Use this as the DEFAULT when evidence neither clearly confirms nor disproves the claim.\n"
@@ -1566,29 +1567,29 @@ def judge_claims(state: GraphState, config: Optional[RunnableConfig] = None) -> 
                 if res.get("verdict") == "Unverified":
                     res["verdict"] = VerdictType.PARTIALLY_VERIFIED.value
 
-                # Supporting-span handling for a Verified verdict with no quote:
-                #   - MULTIPLE independent clusters -> KEEP Verified.
-                #   - A SINGLE cluster/origin -> Partially Verified (attribute).
-                #   - No evidence at all -> Partially Verified (thin, not wrong).
-                if res.get("verdict") == VerdictType.VERIFIED.value and not res.get("supporting_span"):
-                    independent_clusters = sum(
-                        1 for cl in clusters if cl.get("origin") == "independent"
-                    )
-                    total_clusters = len(clusters)
-                    if independent_clusters >= 2 or total_clusters >= 2 or primary_ev:
-                        # Strong: leave as Verified.
-                        pass
-                    else:
-                        res["verdict"] = VerdictType.PARTIALLY_VERIFIED.value
-                        res["reasoning"] = (
-                            "Partially Verified: some support but not enough independent "
-                            "corroboration; attribute the source. " + (res.get("reasoning", ""))
-                        )
+                # STRICT EMPTY SPAN RULE: If Verified, MUST have a span.
+                if res.get("verdict") == VerdictType.VERIFIED.value and not str(res.get("supporting_span") or "").strip():
+                    res["verdict"] = VerdictType.PARTIALLY_VERIFIED.value
+                    res["reasoning"] = "Downgraded to Partially Verified: No exact supporting span was quoted from the evidence. " + (res.get("reasoning", ""))
                 
         final_verdict = res.get("verdict", VerdictType.PARTIALLY_VERIFIED.value)
         # Normalize any stray legacy label to the 3-label scheme.
         if final_verdict == "Unverified":
             final_verdict = VerdictType.PARTIALLY_VERIFIED.value
+            
+        # SAFEGUARD: Catch refusal statements hallucinated as 'Verified'
+        if final_verdict in (VerdictType.VERIFIED.value, VerdictType.PARTIALLY_VERIFIED.value):
+            span_reasoning = (str(res.get("supporting_span") or "") + " " + str(res.get("reasoning") or "")).lower()
+            refusal_keywords = [
+                "not involved", "incorrect", "false", "no record", 
+                "contradicts", "not true", "does not support", "did not acquire"
+            ]
+            for kw in refusal_keywords:
+                if kw in span_reasoning:
+                    final_verdict = VerdictType.CONTRADICTED.value
+                    res["reasoning"] = f"Auto-blocked: LLM output contained contradiction keyword '{kw}'. Original reasoning: {res.get('reasoning', '')}"
+                    break
+                    
         entry = {
             "index": claim.get("id"),
             "claim_text": claim_text,
@@ -1895,7 +1896,7 @@ def analyze_gaps(state: GraphState) -> dict:
 def synthesize_report(state: GraphState) -> dict:
     """
     Generate the final one-page diagnostic markdown report.
-    Enforces Growpido house rules.
+    Enforces NoCap.ai house rules.
     """
     if not state.get("approved", False):
         logger.warning("Synthesis blocked: not approved by human reviewer.")
