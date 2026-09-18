@@ -212,7 +212,7 @@ class HybridResearcher:
         )
 
         payload = {
-            "model": "perplexity/sonar",
+            "model": "sonar",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
@@ -307,7 +307,7 @@ class HybridResearcher:
         )
 
         payload = {
-            "model": "perplexity/sonar",
+            "model": "sonar",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
