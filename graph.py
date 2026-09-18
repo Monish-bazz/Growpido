@@ -1581,8 +1581,8 @@ def judge_claims(state: GraphState, config: Optional[RunnableConfig] = None) -> 
         if final_verdict in (VerdictType.VERIFIED.value, VerdictType.PARTIALLY_VERIFIED.value):
             span_reasoning = (str(res.get("supporting_span") or "") + " " + str(res.get("reasoning") or "")).lower()
             refusal_keywords = [
-                "not involved", "incorrect", "false", "no record", 
-                "contradicts", "not true", "does not support", "did not acquire"
+                "is incorrect", "is false", "is not true", "directly contradicts", 
+                "evidence contradicts", "no record of", "did not acquire"
             ]
             for kw in refusal_keywords:
                 if kw in span_reasoning:

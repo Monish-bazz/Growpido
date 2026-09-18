@@ -67,7 +67,7 @@ class HybridResearcher:
                      URLs and returns the raw page text for granular checking.
     """
 
-    PPLX_ENDPOINT = "https://api.aicredits.com/v1/chat/completions"
+    PPLX_ENDPOINT = "https://api.aicredits.in/v1/chat/completions"
     JINA_PREFIX = "https://r.jina.ai/"
     MAX_DEEP_CHARS = 3000          # cap per-page text to control token cost
     MAX_CITATIONS_TO_CRAWL = 3     # deep-dive into top N urls
@@ -212,7 +212,7 @@ class HybridResearcher:
         )
 
         payload = {
-            "model": "sonar",
+            "model": "perplexity/sonar",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
@@ -307,7 +307,7 @@ class HybridResearcher:
         )
 
         payload = {
-            "model": "sonar",
+            "model": "perplexity/sonar",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_content},
